@@ -343,7 +343,7 @@ export default function HomePage() {
               </div>
             </div>
             <div>
-              <h2 className="text-4xl font-bold text-[#354B62] mb-6">About IndiemTech</h2>
+              <h2 className="text-4xl font-bold text-[#354B62] mb-6">About Indiem</h2>
               <p className="text-lg text-gray-600 mb-6">
                 With over a decade of experience in healthcare administration, we understand the unique challenges faced by healthcare providers. Our mission is to simplify complex processes and help you focus on what matters most - patient care.
               </p>
