@@ -79,11 +79,11 @@ export default function Footer() {
               <div className="flex items-center space-x-3 mb-6">
                 <img
                   src="/logo.png" // Adjust the path to your logo file
-                  alt="HealthCare Solutions Logo"
+                  alt="Logo"
                   className=" w-12 h-12  object-contain"
                 />
                 <div>
-                  <h3 className="text-xl font-bold">HealthCare Solutions</h3>
+                  <h3 className="text-xl font-bold">IndiemTech</h3>
                   <p className="text-white/70 text-sm">Professional Healthcare Management</p>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export default function Footer() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-2 text-white/60">
-                <span>&copy; 2024 HealthCare Solutions. All rights reserved.</span>
+                <span>&copy; 2025 IndiemTech. All rights reserved.</span>
               </div>
               
               <div className="flex items-center space-x-1 text-sm text-white/60">
