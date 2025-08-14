@@ -163,7 +163,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 gap-6 text-center">
+            {/* <div className="mt-12 grid grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-3xl font-bold mb-1">10K+</div>
                 <div className="text-white/80 text-sm">Claims Processed</div>
@@ -176,7 +176,7 @@ export default function SignupPage() {
                 <div className="text-3xl font-bold mb-1">98%</div>
                 <div className="text-white/80 text-sm">Success Rate</div>
               </div>
-            </div>
+            </div> */}
 
             <div className="mt-8 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
               <p className="text-sm text-white/90 italic">

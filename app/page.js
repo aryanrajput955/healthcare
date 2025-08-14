@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
 export default function HomePage() {
   const heroRef = useRef(null)
   const servicesRef = useRef(null)
-  const statsRef = useRef(null)
+  // const statsRef = useRef(null)
   const featuresRef = useRef(null)
 
   useEffect(() => {
@@ -55,20 +55,20 @@ export default function HomePage() {
     )
 
     // Stats counter animation
-    gsap.fromTo(statsRef.current.querySelectorAll('.stat-number'), 
-      { textContent: 0 },
-      { 
-        textContent: (i, target) => target.getAttribute('data-value'),
-        duration: 1.5,
-        ease: "power1.out",
-        snap: { textContent: 1 },
-        scrollTrigger: {
-          trigger: statsRef.current,
-          start: "top 80%",
-          toggleActions: "play none none none"
-        }
-      }
-    )
+    // gsap.fromTo(statsRef.current.querySelectorAll('.stat-number'), 
+    //   { textContent: 0 },
+    //   { 
+    //     textContent: (i, target) => target.getAttribute('data-value'),
+    //     duration: 1.5,
+    //     ease: "power1.out",
+    //     snap: { textContent: 1 },
+    //     scrollTrigger: {
+    //       trigger: statsRef.current,
+    //       start: "top 80%",
+    //       toggleActions: "play none none none"
+    //     }
+    //   }
+    // )
 
     // Features animation
     gsap.fromTo(featuresRef.current.querySelectorAll('.feature-item'), 
@@ -134,9 +134,9 @@ export default function HomePage() {
   ]
 
   const features = [
-    "HIPAA Compliant Systems",
-    "Real-time Claim Tracking",
+    // "HIPAA Compliant Systems",
     "Automated Workflow Management",
+    "Real-time Claim Tracking",
     "Advanced Analytics & Reporting",
     "Multi-payer Integration",
     "Secure Data Encryption",
@@ -170,14 +170,14 @@ export default function HomePage() {
               </p>
               
               <div className="grid grid-cols-3 gap-4 max-w-lg">
-                <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
+                {/* <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-[#27A395]">98%</div>
                   <div className="text-sm text-white/70">Success Rate</div>
                 </div>
                 <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-[#27A395]">10K+</div>
                   <div className="text-sm text-white/70">Claims Processed</div>
-                </div>
+                </div> */}
                 <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-[#27A395]">24/7</div>
                   <div className="text-sm text-white/70">Support</div>
@@ -198,7 +198,7 @@ export default function HomePage() {
                 </Link>
               </div>
               
-              <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-white/80">
+              {/* <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-white/80">
                 <div className="flex items-center space-x-2">
                   <Shield className="w-4 h-4" />
                   <span>HIPAA Compliant</span>
@@ -207,7 +207,7 @@ export default function HomePage() {
                   <CheckCircle className="w-4 h-4" />
                   <span>ISO 27001 Certified</span>
                 </div>
-              </div>
+              </div> */}
             </div>
             
             <div className="lg:col-span-4 space-y-6 hidden lg:block">
@@ -266,7 +266,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section ref={statsRef} className="py-20 bg-[#354B62] text-white">
+      {/* <section ref={statsRef} className="py-20 bg-[#354B62] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -280,7 +280,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Features Section */}
       <section ref={featuresRef} className="py-20">

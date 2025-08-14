@@ -213,7 +213,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-6">
-              <div className="flex items-start space-x-4">
+              {/* <div className="flex items-start space-x-4">
                 <div className="bg-white/20 rounded-lg p-2 mt-1">
                   <CheckCircle className="w-6 h-6" />
                 </div>
@@ -221,7 +221,7 @@ export default function LoginPage() {
                   <h3 className="font-semibold text-lg mb-1">HIPAA Compliant</h3>
                   <p className="text-white/80">Full compliance with healthcare data protection standards</p>
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex items-start space-x-4">
                 <div className="bg-white/20 rounded-lg p-2 mt-1">

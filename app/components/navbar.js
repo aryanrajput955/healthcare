@@ -39,7 +39,7 @@ export default function Navbar() {
               alt="logo"
               className="w-10 h-10 object-contain"
             />
-            <span className="text-xl font-bold text-[#354B62]">IndiemTech</span>
+            <span className="text-xl font-bold text-[#354B62]">Indiem</span>
           </Link>
 
           {/* Desktop Navigation */}

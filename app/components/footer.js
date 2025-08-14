@@ -48,7 +48,7 @@ export default function Footer() {
   const legalLinks = [
     { name: 'Privacy Policy', href: '#privacy' },
     { name: 'Terms of Service', href: '#terms' },
-    { name: 'HIPAA Compliance', href: '#hipaa' },
+    // { name: 'HIPAA Compliance', href: '#hipaa' },
     { name: 'Security', href: '#security' },
     { name: 'Cookie Policy', href: '#cookies' },
     { name: 'Accessibility', href: '#accessibility' }
@@ -146,14 +146,14 @@ export default function Footer() {
               </ul>
 
               {/* Certifications */}
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <h5 className="font-semibold mb-3 text-white">Certifications</h5>
                 <div className="flex flex-wrap gap-2">
                   <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">HIPAA Compliant</span>
                   <span className="bg-[#33A8D3] text-white text-xs px-2 py-1 rounded">SOC 2 Type II</span>
                   <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">ISO 27001</span>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Newsletter & Legal */}
