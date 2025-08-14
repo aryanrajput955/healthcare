@@ -387,7 +387,7 @@ export default function HomePage() {
                 <Mail className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Email Us</h3>
-              <p className="text-white/80">info@healthcaresolutions.com</p>
+              <p className="text-white/80">hello@indiem.tech</p>
             </div>
             
             <div className="text-center">
@@ -395,7 +395,7 @@ export default function HomePage() {
                 <MapPin className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Visit Us</h3>
-              <p className="text-white/80">123 Healthcare Ave, Medical District</p>
+              <p className="text-white/80 lowercase">OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301</p>
             </div>
           </div>
         </div>

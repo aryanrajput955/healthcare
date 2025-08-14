@@ -101,11 +101,11 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-[#27A395]" />
-                  <span className="text-white/80">info@healthcaresolutions.com</span>
+                  <span className="text-white/80">hello@indiem.tech</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-[#27A395]" />
-                  <span className="text-white/80">123 Healthcare Ave, Medical District</span>
+                  <MapPin className="w-12 h-9  sm:w-20 h-10 text-[#27A395]" />
+                  <span className="text-white/80 lowercase ">OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301</span>
                 </div>
               </div>
             </div>
@@ -228,8 +228,8 @@ export default function Footer() {
               </div>
               
               <div className="flex items-center space-x-4 text-sm text-white/60">
-                <span>🔒 Secure & HIPAA Compliant</span>
-                <span>•</span>
+                {/* <span>🔒 Secure & HIPAA Compliant</span> */}
+                {/* <span>•</span> */}
                 <span>24/7 Support Available</span>
               </div>
             </div>
