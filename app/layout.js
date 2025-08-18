@@ -5,7 +5,14 @@ import Footer from './components/footer'
 export const metadata = {
   title: 'HealthCare Solutions - Professional Healthcare Management',
   description: 'Professional healthcare management services including insurance claims, technical support, and custom CMS solutions.',
-}
+
+    icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+};
+
 
 export default function RootLayout({ children }) {
   return (

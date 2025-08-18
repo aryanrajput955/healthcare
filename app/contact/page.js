@@ -139,7 +139,7 @@ export default function ContactPage() {
       icon: Mail,
       title: 'Email Us',
       description: 'Send us a detailed message about your needs',
-      contact: 'info@healthcaresolutions.com',
+      contact: 'hello@indiem.tech',
       availability: 'Response within 2 hours',
       color: 'bg-[#33A8D3]'
     },
@@ -164,7 +164,7 @@ export default function ContactPage() {
   const officeLocations = [
     {
       city: 'New York',
-      address: '123 Healthcare Ave, Medical District, NY 10001',
+      address: 'OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301',
       phone: '+1 (555) 123-4567',
       hours: 'Mon-Fri: 8AM-8PM EST'
     },
