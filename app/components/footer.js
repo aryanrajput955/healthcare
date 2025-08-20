@@ -27,14 +27,18 @@ export default function Footer() {
     )
   }, [])
 
-  const services = [
-    { name: 'Insurance Claims Processing', href: '#services', icon: Shield },
-    { name: 'Rejected Claims Recovery', href: '#services', icon: FileText },
-    { name: 'Claims Delay Resolution', href: '#services', icon: Clock },
-    { name: 'Technical Support', href: '#services', icon: Headphones },
-    { name: 'CMS Portal Development', href: '#services', icon: Database },
-    { name: 'Form Processing', href: '#services', icon: FormInput }
-  ]
+  const services = {
+    forPeople: [
+      { name: 'Insurance Claims Processing', href: '#services', icon: Shield },
+      { name: 'Rejected Claims Recovery', href: '#services', icon: FileText },
+      { name: 'Claims Delay Resolution', href: '#services', icon: Clock }
+    ],
+    forHospitals: [
+      { name: 'Technical Support', href: '#services', icon: Headphones },
+      { name: 'CMS Portal Development', href: '#services', icon: Database },
+      { name: 'Form Processing', href: '/forms', icon: FormInput }
+    ]
+  }
 
   const quickLinks = [
     { name: 'About Us', href: '#about' },
@@ -48,7 +52,6 @@ export default function Footer() {
   const legalLinks = [
     { name: 'Privacy Policy', href: '#privacy' },
     { name: 'Terms of Service', href: '#terms' },
-    // { name: 'HIPAA Compliance', href: '#hipaa' },
     { name: 'Security', href: '#security' },
     { name: 'Cookie Policy', href: '#cookies' },
     { name: 'Accessibility', href: '#accessibility' }
@@ -66,7 +69,7 @@ export default function Footer() {
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#27A395]/20 to-[#33A8D3]/20"></div>
-        <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+        <div className="absolute top-20 left-ADDRESS20 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
         <div className="absolute bottom-20 right-20 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
       </div>
 
@@ -78,9 +81,9 @@ export default function Footer() {
             <div className="footer-section lg:col-span-1">
               <div className="flex items-center space-x-3 mb-6">
                 <img
-                  src="/logo.png" // Adjust the path to your logo file
+                  src="/logo.png"
                   alt="Logo"
-                  className=" w-12 h-12  object-contain"
+                  className="w-12 h-12 object-contain"
                 />
                 <div>
                   <h3 className="text-xl font-bold">Indiem</h3>
@@ -104,8 +107,8 @@ export default function Footer() {
                   <span className="text-white/80">hello@indiem.tech</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin className="w-12 h-9  sm:w-20 h-10 text-[#27A395]" />
-                  <span className="text-white/80 lowercase ">OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301</span>
+                  <MapPin className="w-12 h-9 sm:w-20 h-10 text-[#27A395]" />
+                  <span className="text-white/80 lowercase">OFFICE NO – 101, FIRST FLOOR, AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301</span>
                 </div>
               </div>
             </div>
@@ -113,19 +116,40 @@ export default function Footer() {
             {/* Services */}
             <div className="footer-section">
               <h4 className="text-lg font-semibold mb-6 text-white">Our Services</h4>
-              <ul className="space-y-3">
-                {services.map((service, index) => (
-                  <li key={index}>
-                    <Link 
-                      href={service.href} 
-                      className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group"
-                    >
-                      <service.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      <span>{service.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                <div>
+                  <h5 className="text-sm font-semibold text-white/80 mb-2">For People</h5>
+                  <ul className="space-y-3">
+                    {services.forPeople.map((service, index) => (
+                      <li key={index}>
+                        <Link 
+                          href={service.href} 
+                          className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group"
+                        >
+                          <service.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                          <span>{service.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-sm font-semibold text-white/80 mb-2">For Hospitals</h5>
+                  <ul className="space-y-3">
+                    {services.forHospitals.map((service, index) => (
+                      <li key={index}>
+                        <Link 
+                          href={service.href} 
+                          className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group"
+                        >
+                          <service.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                          <span>{service.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
 
             {/* Quick Links */}
@@ -144,16 +168,6 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-
-              {/* Certifications */}
-              {/* <div className="mt-8">
-                <h5 className="font-semibold mb-3 text-white">Certifications</h5>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">HIPAA Compliant</span>
-                  <span className="bg-[#33A8D3] text-white text-xs px-2 py-1 rounded">SOC 2 Type II</span>
-                  <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">ISO 27001</span>
-                </div>
-              </div> */}
             </div>
 
             {/* Newsletter & Legal */}
@@ -228,8 +242,6 @@ export default function Footer() {
               </div>
               
               <div className="flex items-center space-x-4 text-sm text-white/60">
-                {/* <span>🔒 Secure & HIPAA Compliant</span> */}
-                {/* <span>•</span> */}
                 <span>24/7 Support Available</span>
               </div>
             </div>

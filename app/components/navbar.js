@@ -8,6 +8,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isServicesOpen, setIsServicesOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [timeoutId, setTimeoutId] = useState(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,14 +18,33 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const services = [
-    { name: 'Insurance Claims Processing', href: '#services' },
-    { name: 'Rejected Claims Recovery', href: '#services' },
-    { name: 'Claims Delay Resolution', href: '#services' },
-    { name: 'Technical Support', href: '#services' },
-    { name: 'CMS Portal Development', href: '#services' },
-    { name: 'Form Processing', href: '#services' }
-  ]
+  const services = {
+    forPeople: [
+      { name: 'Insurance Claims Processing', href: '#services' },
+      { name: 'Rejected Claims Recovery', href: '#services' },
+      { name: 'Claims Delay Resolution', href: '#services' }
+    ],
+    forHospitals: [
+      { name: 'Technical Support', href: '#services' },
+      { name: 'CMS Portal Development', href: '#services' },
+      { name: 'Form Processing', href: '/forms' }
+    ]
+  }
+
+  const handleMouseEnter = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      setTimeoutId(null)
+    }
+    setIsServicesOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => {
+      setIsServicesOpen(false)
+    }, 300) // 300ms delay before closing
+    setTimeoutId(id)
+  }
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
@@ -35,7 +55,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <img
-              src="/logo.png" // Adjust the path to your logo file
+              src="/logo.png"
               alt="logo"
               className="w-10 h-10 object-contain"
             />
@@ -44,14 +64,13 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
-              Home
-            </Link>
-            
             {/* Services Dropdown */}
-            <div className="relative">
+            <div 
+              className="relative group"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
-                onClick={() => setIsServicesOpen(!isServicesOpen)}
                 className="flex items-center text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
               >
                 Services
@@ -59,13 +78,31 @@ export default function Navbar() {
               </button>
               
               {isServicesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                  {services.map((service, index) => (
+                <div 
+                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div className="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-200">
+                    For People
+                  </div>
+                  {services.forPeople.map((service, index) => (
                     <Link
                       key={index}
                       href={service.href}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#27A395] transition-colors"
-                      onClick={() => setIsServicesOpen(false)}
+                    >
+                      {service.name}
+                    </Link>
+                  ))}
+                  <div className="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-200">
+                    For Hospitals
+                  </div>
+                  {services.forHospitals.map((service, index) => (
+                    <Link
+                      key={index}
+                      href={service.href}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#27A395] transition-colors"
                     >
                       {service.name}
                     </Link>
@@ -107,14 +144,6 @@ export default function Navbar() {
         {isOpen && (
           <div className="md:hidden bg-white border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                href="/"
-                className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-              
               <div className="px-3 py-2">
                 <button
                   onClick={() => setIsServicesOpen(!isServicesOpen)}
@@ -126,7 +155,22 @@ export default function Navbar() {
                 
                 {isServicesOpen && (
                   <div className="mt-2 pl-4 space-y-1">
-                    {services.map((service, index) => (
+                    <div className="text-sm font-semibold text-gray-800">For People</div>
+                    {services.forPeople.map((service, index) => (
+                      <Link
+                        key={index}
+                        href={service.href}
+                        className="block py-1 text-sm text-gray-600 hover:text-[#27A395] transition-colors"
+                        onClick={() => {
+                          setIsOpen(false)
+                          setIsServicesOpen(false)
+                        }}
+                      >
+                        {service.name}
+                      </Link>
+                    ))}
+                    <div className="text-sm font-semibold text-gray-800 mt-2">For Hospitals</div>
+                    {services.forHospitals.map((service, index) => (
                       <Link
                         key={index}
                         href={service.href}

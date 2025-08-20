@@ -154,10 +154,10 @@ export default function HomePage() {
         <div className="relative z-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 border border-white/20">
+              {/* <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 border border-white/20">
                 <CheckCircle className="w-4 h-4 mr-2 text-[#27A395]" />
                 Trusted by 500+ Healthcare Organizations
-              </div>
+              </div> */}
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                 Professional Healthcare 
@@ -210,7 +210,7 @@ export default function HomePage() {
               </div> */}
             </div>
             
-            <div className="lg:col-span-4 space-y-6 hidden lg:block">
+            {/* <div className="lg:col-span-4 space-y-6 hidden lg:block">
               <div className="bg-white/95 p-6 rounded-xl shadow-lg">
                 <h3 className="text-lg font-semibold text-[#354B62] mb-4">Platform Statistics</h3>
                 <div className="space-y-4">
@@ -236,7 +236,7 @@ export default function HomePage() {
                 <div className="text-lg font-semibold">Enterprise Security</div>
                 <div className="text-sm opacity-90">Bank-level encryption & compliance</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
