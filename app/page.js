@@ -350,7 +350,7 @@ export default function HomePage() {
               <p className="text-lg text-gray-600 mb-8">
                 Our team of certified professionals combines deep healthcare industry knowledge with cutting-edge technology to deliver solutions that drive real results for your organization.
               </p>
-              <div className="grid sm:grid-cols-2 gap-6">
+              {/* <div className="grid sm:grid-cols-2 gap-6">
                 <div className="text-center p-6 bg-white rounded-lg shadow">
                   <div className="text-3xl font-bold text-[#27A395] mb-2">10+</div>
                   <div className="text-gray-600">Years Experience</div>
@@ -359,7 +359,7 @@ export default function HomePage() {
                   <div className="text-3xl font-bold text-[#33A8D3] mb-2">50+</div>
                   <div className="text-gray-600">Expert Team Members</div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
