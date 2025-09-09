@@ -1,17 +1,37 @@
-'use client';
+"use client";
+
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 const FormComponent = () => {
   const [formFields, setFormFields] = useState([]);
   const [formData, setFormData] = useState({});
-
   const [errors, setErrors] = useState({});
   const [fetchedForm, setFetchedForm] = useState(null);
+  const [authError, setAuthError] = useState(null);
+  const router = useRouter();
+
+  // Check for JWT on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setAuthError('Please login first');
+      // Redirect to login page after a short delay to show the message
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    }
+  }, [router]);
 
   const handleFetchForm = async () => {
     try {
-      const response = await axios.get('http://localhost:3010/forms/1');
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3010/forms/1', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const formDef = JSON.parse(response.data.fields);
       setFormFields(formDef);
       // Initialize formData with empty or default values
@@ -25,14 +45,24 @@ const FormComponent = () => {
       });
       setFormData(initialData);
     } catch (error) {
-      setFormFields([]);
-      setFormData({});
-      setFetchedForm({ error: error.message });
+      if (error.response?.status === 401) {
+        setAuthError('Unauthorized access. Please login again.');
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else {
+        setFormFields([]);
+        setFormData({});
+        setFetchedForm({ error: error.message });
+      }
     }
   };
 
   useEffect(() => {
-    handleFetchForm();
+    const token = localStorage.getItem('token');
+    if (token) {
+      handleFetchForm();
+    }
   }, []);
 
   const validateField = (name, value, field) => {
@@ -89,27 +119,51 @@ const FormComponent = () => {
 
     if (isValid) {
       try {
-        const response = await axios.post('http://localhost:3010/form-response', {
-          userId: 1, // You can make this dynamic based on logged-in user
-          formId: 8,
-          response: formData
-        });
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+          'http://localhost:3010/form-response',
+          {
+            userId: 1, // Replace with dynamic user ID from JWT or user data
+            formId: 8,
+            response: formData,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log('Form submitted successfully:', response.data);
         alert('Form submitted successfully!');
       } catch (error) {
         console.error('Error submitting form:', error);
-        alert('Error submitting form. Please try again.');
+        if (error.response?.status === 401) {
+          setAuthError('Unauthorized access. Please login again.');
+          setTimeout(() => {
+            router.push('/login');
+          }, 2000);
+        } else {
+          alert('Error submitting form. Please try again.');
+        }
       }
     } else {
       console.log('Form has errors:', newErrors);
     }
   };
 
+  if (authError) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 bg-white shadow-2xl rounded-lg text-center">
+        <h2 className="text-2xl font-bold mb-4 text-red-600">{authError}</h2>
+        <p className="text-gray-600">Redirecting to login page...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-2xl rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Patient Information Form</h2>
       <div className="space-y-6">
-        
         {formFields.length > 0 && (
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             {formFields.map((field) => (

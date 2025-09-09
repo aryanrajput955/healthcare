@@ -49,12 +49,38 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log('Login attempt:', formData)
-    setIsLoading(false)
+
+    try {
+      const response = await fetch('http://localhost:3010/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed')
+      }
+
+      // Store JWT and user data in localStorage
+      localStorage.setItem('token', data.token)
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user))
+      }
+
+      // Redirect to dashboard or handle success
+      console.log('Login successful:', data)
+      // Example: router.push('/dashboard') // Uncomment and use Next.js router for redirection
+      alert('Login successful!')
+    } catch (error) {
+      console.error('Login error:', error)
+      alert(error.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleChange = (e) => {
@@ -213,16 +239,6 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-6">
-              {/* <div className="flex items-start space-x-4">
-                <div className="bg-white/20 rounded-lg p-2 mt-1">
-                  <CheckCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">HIPAA Compliant</h3>
-                  <p className="text-white/80">Full compliance with healthcare data protection standards</p>
-                </div>
-              </div> */}
-
               <div className="flex items-start space-x-4">
                 <div className="bg-white/20 rounded-lg p-2 mt-1">
                   <Users className="w-6 h-6" />
