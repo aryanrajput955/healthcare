@@ -11,7 +11,7 @@ const FormComponent = () => {
 
   const handleFetchForm = async () => {
     try {
-      const response = await axios.get('http://localhost:3010/forms/12');
+      const response = await axios.get('http://localhost:3010/forms/1');
       const formDef = JSON.parse(response.data.fields);
       setFormFields(formDef);
       // Initialize formData with empty or default values

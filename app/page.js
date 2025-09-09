@@ -1,44 +1,86 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Link from 'next/link'
-import { Shield, FileText, Clock, Headphones, Database, FormInput, CheckCircle, Users, Award, TrendingUp, Phone, Mail, MapPin, ArrowRight } from 'lucide-react'
+import { Shield, FileText, Clock, Headphones, Database, FormInput, CheckCircle, Users, Award, TrendingUp, Phone, Mail, MapPin, ArrowRight, User } from 'lucide-react'
+import ProcessAccordion from './components/stepper'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function HomePage() {
   const heroRef = useRef(null)
   const servicesRef = useRef(null)
-  // const statsRef = useRef(null)
   const featuresRef = useRef(null)
+  const formRef = useRef(null)
+  
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    serviceType: '',
+    message: ''
+  })
+
+  const serviceTypes = [
+    "Insurance Claims Processing",
+    "Rejected Claims Recovery",
+    "Claims Delay Resolution",
+    "Technical Support",
+    "CMS Portal Development",
+    "Form Submissions & Processing"
+  ]
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setIsSubmitted(true)
+    setIsSubmitting(false)
+  }
 
   useEffect(() => {
-    // Hero animations - simplified for performance
-    const tl = gsap.timeline()
+    // Optimized Hero animations - reduced duration and simplified properties
+    const tl = gsap.timeline({
+      defaults: { ease: "power2.out" } // Use a consistent easing for smoother transitions
+    })
+
+    // Faster animations with reduced duration and transform-only properties
     tl.fromTo(heroRef.current.querySelector('.trust-indicator'), 
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      { opacity: 0, y: 10 }, // Reduced y translation for less movement
+      { opacity: 1, y: 0, duration: 0.4 } // Reduced duration for faster animation
     )
     .fromTo(heroRef.current.querySelector('.hero-title'), 
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+      { opacity: 0, y: 15 }, // Reduced y translation
+      { opacity: 1, y: 0, duration: 0.5 } // Faster duration
     )
     .fromTo(heroRef.current.querySelector('.hero-subtitle'), 
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }
+      { opacity: 0, y: 10 }, // Reduced y translation
+      { opacity: 1, y: 0, duration: 0.4 } // Faster duration
     )
     .fromTo(heroRef.current.querySelectorAll('.metric-card'), 
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" }
+      { opacity: 0, y: 10 }, // Reduced y translation
+      { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 } // Faster with reduced stagger
     )
     .fromTo(heroRef.current.querySelectorAll('.hero-cta button'), 
-      { opacity: 0, y: 15 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" }
+      { opacity: 0, y: 10 }, // Reduced y translation
+      { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 } // Faster with reduced stagger
+    )
+    .fromTo(formRef.current, 
+      { opacity: 0, x: 15 }, // Reduced x translation
+      { opacity: 1, x: 0, duration: 0.4 }, // Faster duration
+      "-=0.2" // Overlap with previous animation to reduce total timeline duration
     )
 
-    // Services animation - simplified
+    // Services animation
     gsap.fromTo(servicesRef.current.querySelectorAll('.service-card'), 
       { opacity: 0, y: 30 },
       { 
@@ -53,22 +95,6 @@ export default function HomePage() {
         }
       }
     )
-
-    // Stats counter animation
-    // gsap.fromTo(statsRef.current.querySelectorAll('.stat-number'), 
-    //   { textContent: 0 },
-    //   { 
-    //     textContent: (i, target) => target.getAttribute('data-value'),
-    //     duration: 1.5,
-    //     ease: "power1.out",
-    //     snap: { textContent: 1 },
-    //     scrollTrigger: {
-    //       trigger: statsRef.current,
-    //       start: "top 80%",
-    //       toggleActions: "play none none none"
-    //     }
-    //   }
-    // )
 
     // Features animation
     gsap.fromTo(featuresRef.current.querySelectorAll('.feature-item'), 
@@ -85,6 +111,12 @@ export default function HomePage() {
         }
       }
     )
+
+    // Cleanup on unmount
+    return () => {
+      tl.kill() // Kill the timeline to prevent memory leaks
+      ScrollTrigger.getAll().forEach(st => st.kill()) // Kill all ScrollTriggers
+    }
   }, [])
 
   const services = [
@@ -126,15 +158,7 @@ export default function HomePage() {
     }
   ]
 
-  const stats = [
-    { number: "10000", label: "Claims Processed", suffix: "+" },
-    { number: "98", label: "Success Rate", suffix: "%" },
-    { number: "500", label: "Healthcare Providers", suffix: "+" },
-    { number: "24", label: "Support Hours", suffix: "/7" }
-  ]
-
   const features = [
-    // "HIPAA Compliant Systems",
     "Automated Workflow Management",
     "Real-time Claim Tracking",
     "Advanced Analytics & Reporting",
@@ -146,45 +170,37 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Optimized Hero Section */}
+      {/* Hero Section */}
       <section ref={heroRef} className="relative text-white py-20 lg:py-28 min-h-[90vh] flex items-center">
         <div className="absolute inset-0 bg-[url('/img4.jpg')] bg-cover bg-center z-1" />
         <div className="absolute inset-0 bg-gradient-to-br from-[#354B62]/90 to-[#2C3E50]/90 z-2" />
         
         <div className="relative z-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid lg:grid-cols-12 gap-8 items-center">
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 space-y-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 border border-white/20">
+              <div className="trust-indicator inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 border border-white/20">
                 <CheckCircle className="w-4 h-4 mr-2 text-[#27A395]" />
                 Trusted by 500+ Healthcare Organizations
               </div>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+              <h1 className="hero-title text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                 Professional Healthcare 
                 <br />
                 <span className="text-[#27A395]">Management Solutions</span>
               </h1>
               
-              <p className="text-lg lg:text-xl text-white/90 leading-relaxed max-w-2xl">
+              <p className="hero-subtitle text-lg lg:text-xl text-white/90 leading-relaxed max-w-2xl">
                 Streamline your healthcare operations with enterprise-grade claims processing, custom CMS development, and comprehensive technical support services.
               </p>
               
               <div className="grid grid-cols-3 gap-4 max-w-lg">
-                {/* <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-[#27A395]">98%</div>
-                  <div className="text-sm text-white/70">Success Rate</div>
-                </div>
-                <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-[#27A395]">10K+</div>
-                  <div className="text-sm text-white/70">Claims Processed</div>
-                </div> */}
-                <div className="bg-white/10 border border-white/15 p-4 rounded-lg text-center">
+                <div className="metric-card bg-white/10 border border-white/15 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-[#27A395]">24/7</div>
                   <div className="text-sm text-white/70">Support</div>
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <div className="hero-cta flex flex-col sm:flex-row gap-4 pt-2">
                 <Link href="/signup">
                   <button className="bg-[#27A395] hover:bg-[#229b87] text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 inline-flex items-center justify-center">
                     Get Started
@@ -197,45 +213,129 @@ export default function HomePage() {
                   </button>
                 </Link>
               </div>
-              
-              {/* <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-white/80">
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
-                  <span>HIPAA Compliant</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>ISO 27001 Certified</span>
-                </div>
-              </div> */}
             </div>
             
-            <div className="lg:col-span-4 space-y-6 hidden lg:block">
-              <div className="bg-white/95 p-6 rounded-xl shadow-lg">
-                <h3 className="text-lg font-semibold text-[#354B62] mb-4">Platform Statistics</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Healthcare Providers</span>
-                    <span className="text-2xl font-bold text-[#354B62]">500+</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-[#27A395] h-2 rounded-full" style={{width: '95%'}}></div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">System Uptime</span>
-                    <span className="text-2xl font-bold text-[#27A395]">99.9%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-[#33A8D3] h-2 rounded-full" style={{width: '99%'}}></div>
-                  </div>
+            {/* Contact Form */}
+            <div ref={formRef} className="lg:col-span-4 bg-white rounded-3xl shadow-2xl p-8">
+              <h2 className="text-2xl font-bold text-[#354B62] mb-4">Contact Us</h2>
+              {isSubmitted ? (
+                <div className="text-center py-8">
+                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-green-600 mb-2">Message Sent!</h3>
+                  <p className="text-gray-600">We'll respond within 2 hours.</p>
                 </div>
-              </div>
-              
-              <div className="bg-[#27A395] text-white p-6 rounded-xl text-center shadow-lg">
-                <Shield className="w-12 h-12 mx-auto mb-3" />
-                <div className="text-lg font-semibold">Enterprise Security</div>
-                <div className="text-sm opacity-90">Bank-level encryption & compliance</div>
-              </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="form-group">
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Name *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none text-black transition-all duration-300 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3 text-black border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full text-black pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your phone number"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="serviceType" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Service Interest
+                    </label>
+                    <select
+                      id="serviceType"
+                      name="serviceType"
+                      value={formData.serviceType}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 text-gray-500 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                    >
+                      <option value="">Select a service</option>
+                      {serviceTypes.map((service) => (
+                        <option key={service} value={service}>{service}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Message *
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-3 border-2 text-black border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 bg-gray-50 focus:bg-white resize-none"
+                      placeholder="Your message..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r  from-[#27A395] to-[#33A8D3] text-white py-3 rounded-xl font-semibold text-lg hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-5 h-5 mr-2" />
+                        Send Message
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -264,23 +364,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Stats Section */}
-      {/* <section ref={statsRef} className="py-20 bg-[#354B62] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold mb-2">
-                  <span className="stat-number" data-value={stat.number}>0</span>
-                  <span>{stat.suffix}</span>
-                </div>
-                <p className="text-white/80 text-lg">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* Features Section */}
       <section ref={featuresRef} className="py-20">
@@ -333,7 +416,6 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <div className="bg-gray-200 rounded-2xl h-[30rem] w-full shadow-lg overflow-hidden">
-                {/* Consider using Next.js Image here */}
                 <img 
                   src="/img.jpg" 
                   alt="Healthcare professionals working" 
@@ -364,6 +446,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <ProcessAccordion />
 
       {/* Contact Section */}
       <section className="py-20 bg-[#354B62] text-white">
