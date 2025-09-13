@@ -309,7 +309,7 @@ export default function HomePage() {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      rows={4}
+                      rows={1}
                       className="w-full px-4 py-3 border-2 text-black border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 bg-gray-50 focus:bg-white resize-none"
                       placeholder="Your message..."
                       required
