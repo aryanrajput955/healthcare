@@ -1,3 +1,4 @@
+// app/layout.js
 import "./globals.css";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -7,7 +8,6 @@ export const metadata = {
   title: "HealthCare Solutions - Professional Healthcare Management",
   description:
     "Professional healthcare management services including insurance claims, technical support, and custom CMS solutions.",
-
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
           `}
         </Script>
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <Navbar />
         <main className="pt-16">{children}</main>
         <Footer />

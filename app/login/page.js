@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { gsap } from 'gsap'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield, CheckCircle, Users, Award } from 'lucide-react'
+import useAuthStore from '../lib/authstore' // Adjust path as needed
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -15,6 +17,8 @@ export default function LoginPage() {
   const containerRef = useRef(null)
   const formRef = useRef(null)
   const sidebarRef = useRef(null)
+  const router = useRouter()
+  const { setAuth } = useAuthStore()
 
   useEffect(() => {
     // Container animation
@@ -65,16 +69,27 @@ export default function LoginPage() {
         throw new Error(data.message || 'Login failed')
       }
 
-      // Store JWT and user data in localStorage
-      localStorage.setItem('token', data.token)
-      if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user))
+      // Extract token from access_token field
+      const token = data.access_token
+
+      // Validate token
+      if (!token || typeof token !== 'string') {
+        throw new Error('Invalid token received from server')
       }
 
-      // Redirect to dashboard or handle success
+      // Create fallback user data using email (no API user object available)
+      const userData = {
+        name: formData.email.split('@')[0] || formData.email || 'User', // e.g., "john" from "john@example.com"
+        email: formData.email
+      }
+      console.log('Using fallback user data:', userData)
+
+      // Store auth data using Zustand
+      setAuth(userData, token)
+
       console.log('Login successful:', data)
-      // Example: router.push('/dashboard') // Uncomment and use Next.js router for redirection
-      alert('Login successful!')
+      alert('Login successful! Check the navbar for the profile icon.')
+      // No redirection; remain on login page to observe navbar change
     } catch (error) {
       console.error('Login error:', error)
       alert(error.message)

@@ -1,17 +1,33 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, User, ChevronRight } from 'lucide-react'
+import { gsap } from 'gsap'
+import useAuthStore from '../lib/authstore' // Adjust path as needed
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isEnterpriseOpen, setIsEnterpriseOpen] = useState(false)
   const [isPersonalOpen, setIsPersonalOpen] = useState(false)
+  const [isSideNavOpen, setIsSideNavOpen] = useState(false)
+  const [isUserJourneyOpen, setIsUserJourneyOpen] = useState(false)
+  const [isCashlessJourneyOpen, setIsCashlessJourneyOpen] = useState(false)
+  const [isReimbursementJourneyOpen, setIsReimbursementJourneyOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const enterpriseTimeoutRef = useRef(null)
   const personalTimeoutRef = useRef(null)
+  const sideNavRef = useRef(null)
 
+  // Use Zustand store for authentication
+  const { user, token, initializeAuth, clearAuth } = useAuthStore()
+
+  // Initialize auth on mount
+  useEffect(() => {
+    initializeAuth()
+  }, [initializeAuth])
+
+  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50)
@@ -20,7 +36,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Clear timeouts on component unmount to prevent memory leaks
+  // Clear timeouts on component unmount
   useEffect(() => {
     return () => {
       if (enterpriseTimeoutRef.current) clearTimeout(enterpriseTimeoutRef.current)
@@ -28,11 +44,22 @@ export default function Navbar() {
     }
   }, [])
 
+  // GSAP animation for side navbar
+  useEffect(() => {
+    if (sideNavRef.current) {
+      gsap.fromTo(
+        sideNavRef.current,
+        { x: '100%' },
+        { x: 0, duration: 0.3, ease: 'power3.out' }
+      )
+    }
+  }, [isSideNavOpen])
+
   const enterpriseSolutions = [
     { name: '360 Digital Solutions', href: '#enterprise-health-claim' },
-    { name: 'Geniune Cashless', href: '#enterprise-cashless' },
-     { name: 'Rejection Claims' , href: '#enterprise-cashless' },
-        { name: 'Pre-authorization Approval' , href: '#enterprise-cashless' }
+    { name: 'Genuine Cashless', href: '#enterprise-cashless' },
+    { name: 'Rejection Claims', href: '#enterprise-cashless' },
+    { name: 'Pre-authorization Approval', href: '#enterprise-cashless' }
   ]
 
   const personalSolutions = [
@@ -42,17 +69,35 @@ export default function Navbar() {
     { name: 'Claim Short-Settled', href: '#short-settled' }
   ]
 
-  // Handlers for Enterprise dropdown with delayed close
+  const userJourney = [
+    { name: 'Profile Setup', href: '#user-journey-profile' },
+    { name: 'Health Records', href: '#user-journey-records' },
+    { name: 'Appointments', href: '#user-journey-appointments' }
+  ]
+
+  const cashlessJourney = [
+    { name: 'Cashless Claims', href: '#cashless-journey-claims' },
+    { name: 'Hospital Network', href: '#cashless-journey-network' },
+    { name: 'Approval Process', href: '#cashless-journey-approval' }
+  ]
+
+  const reimbursementJourney = [
+    { name: 'Submit Receipts', href: '#reimbursement-journey-receipts' },
+    { name: 'Track Claims', href: '#reimbursement-journey-track' },
+    { name: 'Reimbursement Status', href: '#reimbursement-journey-status' }
+  ]
+
+  // Handlers for Enterprise dropdown
   const openEnterpriseDropdown = () => {
     if (personalTimeoutRef.current) clearTimeout(personalTimeoutRef.current)
     setIsEnterpriseOpen(true)
-    setIsPersonalOpen(false) // Close other dropdown
+    setIsPersonalOpen(false)
   }
 
   const closeEnterpriseDropdown = () => {
     enterpriseTimeoutRef.current = setTimeout(() => {
       setIsEnterpriseOpen(false)
-    }, 200) // 200ms delay before closing
+    }, 200)
   }
 
   const keepEnterpriseOpen = () => {
@@ -60,23 +105,31 @@ export default function Navbar() {
     setIsEnterpriseOpen(true)
   }
 
-  // Handlers for Personal dropdown with delayed close
+  // Handlers for Personal dropdown
   const openPersonalDropdown = () => {
     if (enterpriseTimeoutRef.current) clearTimeout(enterpriseTimeoutRef.current)
     setIsPersonalOpen(true)
-    setIsEnterpriseOpen(false) // Close other dropdown
+    setIsEnterpriseOpen(false)
   }
 
   const closePersonalDropdown = () => {
     personalTimeoutRef.current = setTimeout(() => {
       setIsPersonalOpen(false)
-    }, 200) // 200ms delay before closing
+    }, 200)
   }
 
   const keepPersonalOpen = () => {
     if (personalTimeoutRef.current) clearTimeout(personalTimeoutRef.current)
     setIsPersonalOpen(true)
   }
+
+  // Handlers for side navbar
+  const toggleSideNav = () => {
+    setIsSideNavOpen(!isSideNavOpen)
+  }
+
+  // Dynamic side nav background class
+  const sideNavBgClass = scrolled ? 'bg-white shadow-2xl' : 'bg-white/95 backdrop-blur-sm'
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
@@ -175,17 +228,28 @@ export default function Navbar() {
             <Link href="/contact" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
               Contact
             </Link>
-            
-            <Link href="/login" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
-              Login
-            </Link>
-            
-            <Link 
-              href="/signup" 
-              className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white px-6 py-2 rounded-lg font-medium hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              Sign Up
-            </Link>
+
+            {/* Conditional rendering based on authentication */}
+            {token ? (
+              <button
+                onClick={toggleSideNav}
+                className="flex items-center text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+              >
+                <User className="w-6 h-6" />
+              </button>
+            ) : (
+              <>
+                <Link href="/login" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
+                  Login
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white px-6 py-2 rounded-lg font-medium hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -284,26 +348,166 @@ export default function Navbar() {
               >
                 Contact
               </Link>
-              
-              <Link
-                href="/login"
-                className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                Login
-              </Link>
-              
-              <Link
-                href="/signup"
-                className="block mx-3 mt-2 bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white px-4 py-2 rounded-lg font-medium text-center shadow-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Sign Up
-              </Link>
+
+              {/* Conditional rendering for mobile */}
+              {token ? (
+                <button
+                  onClick={() => {
+                    setIsOpen(false)
+                    toggleSideNav()
+                  }}
+                  className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                >
+                  Profile
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="block mx-3 mt-2 bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white px-4 py-2 rounded-lg font-medium text-center shadow-lg"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
       </div>
+
+      {/* Enhanced Side Navbar (Profile Section) */}
+      {isSideNavOpen && (
+        <div
+          ref={sideNavRef}
+          className={`${sideNavBgClass} fixed top-0 right-0 h-full w-80 bg-gradient-to-b from-white/95 to-white/90 backdrop-blur-md border-l border-gray-200 shadow-2xl z-50 flex flex-col overflow-y-auto rounded-l-xl p-6 transition-all duration-300`}
+        >
+          <button
+            onClick={toggleSideNav}
+            className="absolute top-6 right-6 text-[#354B62] hover:text-[#27A395] transition-colors focus:outline-none focus:ring-2 focus:ring-[#27A395] rounded-full p-1"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          
+          {/* Profile Header */}
+          <div className="flex items-center space-x-4 mb-8 pb-6 border-b border-gray-200">
+            <div className="w-12 h-12 bg-gradient-to-r from-[#27A395] to-[#33A8D3] rounded-full flex items-center justify-center shadow-lg">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-[#354B62]">{user?.name || 'User'}</h3>
+              <p className="text-sm text-gray-500">{user?.email || 'user@example.com'}</p>
+            </div>
+          </div>
+
+          {/* Journey Sections */}
+          <div className="space-y-6 flex-1">
+            <div className="space-y-1">
+              <button
+                onClick={() => setIsUserJourneyOpen(!isUserJourneyOpen)}
+                className="flex items-center justify-between w-full text-left text-[#354B62] hover:text-[#27A395] transition-colors font-semibold py-3 px-2 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#27A395] focus:ring-offset-1"
+              >
+                <span>User Journey</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${isUserJourneyOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isUserJourneyOpen && (
+                <div className="ml-4 space-y-2 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  {userJourney.map((item, index) => (
+                    <Link
+                      key={index}
+                      href={item.href}
+                      className="flex items-center justify-between py-2 text-sm text-gray-700 hover:text-[#27A395] transition-colors group rounded-md px-2 hover:bg-white"
+                      onClick={() => {
+                        setIsSideNavOpen(false)
+                        setIsUserJourneyOpen(false)
+                      }}
+                    >
+                      <span className="font-medium">{item.name}</span>
+                      <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-[#27A395] transition-colors opacity-0 group-hover:opacity-100" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <button
+                onClick={() => setIsCashlessJourneyOpen(!isCashlessJourneyOpen)}
+                className="flex items-center justify-between w-full text-left text-[#354B62] hover:text-[#27A395] transition-colors font-semibold py-3 px-2 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#27A395] focus:ring-offset-1"
+              >
+                <span>Cashless Journey</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${isCashlessJourneyOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isCashlessJourneyOpen && (
+                <div className="ml-4 space-y-2 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  {cashlessJourney.map((item, index) => (
+                    <Link
+                      key={index}
+                      href={item.href}
+                      className="flex items-center justify-between py-2 text-sm text-gray-700 hover:text-[#27A395] transition-colors group rounded-md px-2 hover:bg-white"
+                      onClick={() => {
+                        setIsSideNavOpen(false)
+                        setIsCashlessJourneyOpen(false)
+                      }}
+                    >
+                      <span className="font-medium">{item.name}</span>
+                      <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-[#27A395] transition-colors opacity-0 group-hover:opacity-100" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <button
+                onClick={() => setIsReimbursementJourneyOpen(!isReimbursementJourneyOpen)}
+                className="flex items-center justify-between w-full text-left text-[#354B62] hover:text-[#27A395] transition-colors font-semibold py-3 px-2 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#27A395] focus:ring-offset-1"
+              >
+                <span>Reimbursement Journey</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${isReimbursementJourneyOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isReimbursementJourneyOpen && (
+                <div className="ml-4 space-y-2 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  {reimbursementJourney.map((item, index) => (
+                    <Link
+                      key={index}
+                      href={item.href}
+                      className="flex items-center justify-between py-2 text-sm text-gray-700 hover:text-[#27A395] transition-colors group rounded-md px-2 hover:bg-white"
+                      onClick={() => {
+                        setIsSideNavOpen(false)
+                        setIsReimbursementJourneyOpen(false)
+                      }}
+                    >
+                      <span className="font-medium">{item.name}</span>
+                      <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-[#27A395] transition-colors opacity-0 group-hover:opacity-100" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <button
+              onClick={() => {
+                clearAuth()
+                setIsSideNavOpen(false)
+              }}
+              className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
