@@ -57,16 +57,17 @@ export default function Navbar() {
 
   const enterpriseSolutions = [
     { name: '360 Digital Solutions', href: '#enterprise-health-claim' },
-    { name: 'Genuine Cashless', href: '#enterprise-cashless' },
+    { name: 'Genuine Cashless', href: '/genuine-cashless-rejection-appeal' },
+    { name: 'Health Claims Cashless', href: '/health-claim-cashless' },
     { name: 'Rejection Claims', href: '#enterprise-cashless' },
-    { name: 'Pre-authorization Approval', href: '#enterprise-cashless' }
+    { name: 'Pre-authorization Approval', href: '/pre-authorization-approval' }
   ]
 
   const personalSolutions = [
-    { name: 'Health Claim Reimbursement', href: '#personal-health-claim' },
-    { name: 'Rejected Claims Recovery', href: '#rejected-claims' },
-    { name: 'Claims Delay Resolution', href: '#claims-delay' },
-    { name: 'Claim Short-Settled', href: '#short-settled' }
+    { name: 'Health Claim Reimbursement', href: '/health-claim-reimbursement' },
+    { name: 'Rejected Claims Recovery', href: '/rejected-claims-recovery' },
+    { name: 'Claims Delay Resolution', href: '/claim-delay-resolution' },
+    { name: 'Claim Short-Settled', href: '/claim-short-settled' }
   ]
 
   const userJourney = [

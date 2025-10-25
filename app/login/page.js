@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { gsap } from 'gsap'
 import Link from 'next/link'
-import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield, CheckCircle, Users, Award } from 'lucide-react'
-import useAuthStore from '../lib/authstore' // Adjust path as needed
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield, Users, Award } from 'lucide-react'
+import useAuthStore from '../lib/authstore'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -18,7 +18,11 @@ export default function LoginPage() {
   const formRef = useRef(null)
   const sidebarRef = useRef(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { setAuth } = useAuthStore()
+
+  // Get the redirect URL from query params
+  const redirectUrl = searchParams.get('redirect') || '/dashboard'
 
   useEffect(() => {
     // Container animation
@@ -77,19 +81,20 @@ export default function LoginPage() {
         throw new Error('Invalid token received from server')
       }
 
-      // Create fallback user data using email (no API user object available)
+      // Create fallback user data using email
       const userData = {
-        name: formData.email.split('@')[0] || formData.email || 'User', // e.g., "john" from "john@example.com"
+        name: formData.email.split('@')[0] || formData.email || 'User',
         email: formData.email
       }
-      console.log('Using fallback user data:', userData)
 
-      // Store auth data using Zustand
+      // Store auth data using Zustand (also stores in localStorage)
       setAuth(userData, token)
 
       console.log('Login successful:', data)
-      alert('Login successful! Check the navbar for the profile icon.')
-      // No redirection; remain on login page to observe navbar change
+      
+      // Redirect to the intended route - AuthProvider will allow access
+      router.push(redirectUrl)
+      
     } catch (error) {
       console.error('Login error:', error)
       alert(error.message)
@@ -228,13 +233,13 @@ export default function LoginPage() {
                 </svg>
                 Google
               </button>
-              <button className=" cursor-pointer w-full flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105">
-          <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2" y="2" width="20" height="20" fill="#F25022" />
-  <rect x="26" y="2" width="20" height="20" fill="#00A4EF" />
-  <rect x="2" y="26" width="20" height="20" fill="#7FBA00" />
-  <rect x="26" y="26" width="20" height="20" fill="#FFB900" />
-</svg>
+              <button className="cursor-pointer w-full flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105">
+                <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="20" height="20" fill="#F25022" />
+                  <rect x="26" y="2" width="20" height="20" fill="#00A4EF" />
+                  <rect x="2" y="26" width="20" height="20" fill="#7FBA00" />
+                  <rect x="26" y="26" width="20" height="20" fill="#FFB900" />
+                </svg>
                 Microsoft
               </button>
             </div>
@@ -278,7 +283,7 @@ export default function LoginPage() {
             <div className="mt-12 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
               <p className="text-sm text-white/90 italic">
                 "This platform has revolutionized our claims processing workflow. We've seen a 40% increase in efficiency since implementation."
-              </p>
+              </p> 
               <div className="mt-3">
                 <p className="font-semibold">Dr. Sarah Johnson</p>
                 <p className="text-white/80 text-sm">Chief Medical Officer, HealthFirst Clinic</p>

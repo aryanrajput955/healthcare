@@ -39,11 +39,11 @@ export default function Footer() {
   const quickLinks = [
     { name: 'About Us', href: '#about' },
     { name: 'Our Team', href: '#team' },
-    { name: 'Careers', href: '#careers' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Case Studies', href: '#case-studies' },
-    { name: 'Resources', href: '#resources' }
-  ]
+    // { name: 'Careers', href: '#careers' },
+  //   { name: 'Blog', href: '#blog' },
+  //   { name: 'Case Studies', href: '#case-studies' },
+  //   { name: 'Resources', href: '#resources' }
+   ]
 
   const legalLinks = [
     { name: 'Privacy Policy', href: '#privacy' },

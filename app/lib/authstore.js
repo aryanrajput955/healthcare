@@ -16,6 +16,20 @@ const decodeJWT = (token) => {
   }
 };
 
+// Helper function to set auth cookie
+const setAuthCookie = (token) => {
+  if (typeof document !== 'undefined') {
+    document.cookie = `auth=${token}; path=/; max-age=86400; SameSite=Strict`;
+  }
+};
+
+// Helper function to clear auth cookie
+const clearAuthCookie = () => {
+  if (typeof document !== 'undefined') {
+    document.cookie = 'auth=; path=/; max-age=0; SameSite=Strict';
+  }
+};
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -32,12 +46,14 @@ const useAuthStore = create(
             ? { ...storedUser, id: decodedToken.sub }
             : storedUser;
           set({ user: userWithId, token: storedToken });
+          setAuthCookie(storedToken);
         } else {
           if (storedUser === 'undefined' || storedToken === 'undefined') {
             Store.removeItem('user');
             Store.removeItem('token');
           }
           set({ user: null, token: null });
+          clearAuthCookie();
         }
       },
       setAuth: (user, token) => {
@@ -47,11 +63,13 @@ const useAuthStore = create(
           : user;
         Store.setItem('user', userWithId);
         Store.setItem('token', token);
+        setAuthCookie(token); // Store token in cookie for middleware
         set({ user: userWithId, token });
       },
       clearAuth: () => {
         Store.removeItem('user');
         Store.removeItem('token');
+        clearAuthCookie(); // Clear cookie on logout
         set({ user: null, token: null });
       },
     }),

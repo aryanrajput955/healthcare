@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+
 const FormComponent = ({ formId = 1 }) => {
   const [formFields, setFormFields] = useState([]);
   const [formData, setFormData] = useState({});
@@ -172,6 +173,7 @@ const FormComponent = ({ formId = 1 }) => {
 
   // ✅ Render form
   return (
+
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-2xl rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         {fetchedForm?.title || "Patient Information Form"}
@@ -280,6 +282,7 @@ const FormComponent = ({ formId = 1 }) => {
         )}
       </div>
     </div>
+
   );
 };
 

@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle, Clock, AlertCircle, User, Calendar, ArrowRight, TrendingUp, FileText, Shield, ChevronRight } from 'lucide-react';
 
@@ -47,14 +46,39 @@ const UserJourneyTimeline = () => {
     fetchUserJourneys();
   }, [isClient]);
 
-  // Process userJourneys to determine completion status with more detailed info
+  // Process userJourneys to determine completion status and steps
   const processedJourneys = useMemo(() => {
     return userJourneys.map((uj) => {
       const formCount = uj.formResponses?.length || 0;
       const completedActions = uj.actionResponses?.filter(ar => ar.response?.completed === true).length || 0;
       const totalActions = uj.actionResponses?.length || 0;
       const progress = totalActions > 0 ? (completedActions / totalActions) * 100 : formCount > 0 ? 100 : 0;
-      
+
+      // Process steps to determine completion and find the next incomplete step
+      const processedSteps = uj.steps?.map(step => {
+        const isCompleted = step.actionId 
+          ? uj.actionResponses?.some(ar => ar.actionId === step.actionId && ar.response?.completed)
+          : step.formId 
+            ? uj.formResponses?.some(fr => fr.formId === step.formId)
+            : false; // Should not occur as per clarification
+        return {
+          ...step,
+          isCompleted,
+          isAction: !!step.actionId,
+          isForm: !!step.formId
+        };
+      }) || [];
+
+      // Find the next incomplete step (first step that is not completed)
+      const nextIncompleteStep = processedSteps.find(step => !step.isCompleted) || null;
+
+      // Sort steps: next incomplete step at top (if exists), others by sequentialOrder
+      const sortedSteps = processedSteps.sort((a, b) => {
+        if (nextIncompleteStep && a.id === nextIncompleteStep.id) return -1;
+        if (nextIncompleteStep && b.id === nextIncompleteStep.id) return 1;
+        return a.sequentialOrder - b.sequentialOrder;
+      });
+
       return {
         ...uj,
         isCompleted: progress === 100,
@@ -62,7 +86,9 @@ const UserJourneyTimeline = () => {
         formCount,
         completedActions,
         totalActions,
-        lastUpdated: uj.updatedAt || uj.createdAt
+        lastUpdated: uj.updatedAt || uj.createdAt,
+        sortedSteps,
+        nextIncompleteStep
       };
     });
   }, [userJourneys]);
@@ -76,6 +102,24 @@ const UserJourneyTimeline = () => {
 
     return { total, completed, inProgress, averageProgress };
   }, [processedJourneys]);
+
+  // Mock function to handle completing an action step
+  const handleCompleteStep = (journeyId, stepId, actionId) => {
+    // In a real application, this would make an API call to mark the action as complete
+    console.log(`Completing action step ${stepId} (actionId: ${actionId}) for journey ${journeyId}`);
+    // Example API call (uncomment and adjust as needed):
+    /*
+    fetch(`http://localhost:3010/user-journey/${journeyId}/complete-action/${actionId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer mock-jwt-token`,
+        'Content-Type': 'application/json',
+      },
+    }).then(() => {
+      // Refresh journeys or update state
+    });
+    */
+  };
 
   // Cashless Claim Journey Data from PDF
   const cashlessJourneySteps = [
@@ -411,7 +455,58 @@ const UserJourneyTimeline = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      {/* Steps Section */}
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2">Steps</h4>
+                        <div className="grid gap-3">
+                          {journey.sortedSteps.map((step) => (
+                            <div
+                              key={step.id}
+                              className="flex flex-col sm:flex-row gap-3 p-3 rounded-lg border border-gray-200 bg-gradient-to-r from-white to-gray-50/50"
+                            >
+                              <div className="flex-shrink-0">
+                                <div className={`w-10 h-10 rounded-lg ${
+                                  step.isCompleted ? 'bg-green-500' : 'bg-[#27A395]'
+                                } flex items-center justify-center text-white shadow-md`}>
+                                  {step.isCompleted ? (
+                                    <CheckCircle className="w-5 h-5" />
+                                  ) : (
+                                    <span className="text-sm font-bold">{step.sequentialOrder}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2">
+                                  <div className="flex items-start space-x-2 mb-2 sm:mb-0">
+                                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                      Step {step.sequentialOrder}
+                                      {journey.nextIncompleteStep?.id === step.id && ' (Next)'}
+                                    </span>
+                                    <h5 className="text-base font-semibold text-gray-900">{step.title}</h5>
+                                  </div>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {step.isAction ? 'Action' : 'Form'}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {step.description}
+                                </p>
+                                {journey.nextIncompleteStep?.id === step.id && step.isAction && !step.isCompleted && (
+                                  <button
+                                    onClick={() => handleCompleteStep(journey.id, step.id, step.actionId)}
+                                    className="mt-2 bg-[#27A395] text-white px-3 py-1 rounded-lg font-semibold text-sm hover:bg-[#229b87] transition-colors inline-flex items-center"
+                                  >
+                                    Complete Step
+                                    <CheckCircle className="ml-2 w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-3">
                         <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
                           journey.isCompleted
                             ? 'bg-green-100 text-green-800'
