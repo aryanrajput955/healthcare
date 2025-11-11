@@ -19,7 +19,7 @@ const UserJourneyForm = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3010/user-journey', {
+      const response = await fetch('https://api.indiem.tech/user-journey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

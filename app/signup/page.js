@@ -130,7 +130,7 @@ const handleSubmit = async (e) => {
 
     console.log("signup payload:", payload);
 
-    const response = await fetch("http://localhost:3010/auth/signup", {
+    const response = await fetch("https://api.indiem.tech/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

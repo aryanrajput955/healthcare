@@ -31,7 +31,7 @@ const useJourneyStore = create(
           }
 
           const targetUserId = 1; // Hardcoded for testing; replace with user.id
-          const response = await fetch(`http://localhost:3010/user-journey/user/1`, {
+          const response = await fetch(`https://api.indiem.tech/user-journey/user/1`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,

@@ -29,7 +29,7 @@ const FormComponent = ({ formId = 1 }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:3010/forms/${formId}`,
+        `https://api.indiem.tech/forms/${formId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -137,7 +137,7 @@ const FormComponent = ({ formId = 1 }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3010/form-response",
+        "https://api.indiem.tech/form-response",
         {
           userId: 1, // 🔑 ideally decode from JWT
           formId,

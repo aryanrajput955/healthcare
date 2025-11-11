@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const options = {
   method: 'POST',
-  url: 'http://localhost:3010/forms',
+  url: 'https://api.indiem.tech/forms',
   headers: {'content-type': 'application/json'},
   data: {
     tag: '["claims"]',

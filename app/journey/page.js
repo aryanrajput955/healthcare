@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle, Clock, AlertCircle, User, Calendar, ArrowRight, TrendingUp, FileText, Shield, ChevronRight } from 'lucide-react';
+import useAuthStore from '../lib/authstore';
 
 const UserJourneyTimeline = () => {
   const [userJourneys, setUserJourneys] = useState([]);
@@ -8,24 +9,26 @@ const UserJourneyTimeline = () => {
   const [error, setError] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('journeys');
+  const { user, token, initializeAuth } = useAuthStore();
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    initializeAuth(); // Initialize auth when component mounts
+  }, [initializeAuth]);
 
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || !user?.id) return;
 
     const fetchUserJourneys = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const token = 'mock-jwt-token';
-        const response = await fetch('http://localhost:3010/user-journey/user/1', {
+        const authToken = token || 'mock-jwt-token'; // Use stored token or fallback
+        const response = await fetch(`https://api.indiem.tech/user-journey/user/${user.id}`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
         });
@@ -44,7 +47,7 @@ const UserJourneyTimeline = () => {
     };
 
     fetchUserJourneys();
-  }, [isClient]);
+  }, [isClient, user?.id, token]);
 
   // Process userJourneys to determine completion status and steps
   const processedJourneys = useMemo(() => {
@@ -393,7 +396,7 @@ const UserJourneyTimeline = () => {
                   <FileText className="w-8 h-8 text-gray-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No Journeys Found</h3>
-                <p className="text-sm text-gray-600 mb-4">You don't have any active insurance claim journeys yet.</p>
+                <p className="text-sm text-gray-600 mb-4">You don&apos;t have any active insurance claim journeys yet.</p>
                 <button className="bg-[#27A395] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#229b87] transition-colors inline-flex items-center">
                   Start New Claim
                   <ArrowRight className="ml-2 w-4 h-4" />
