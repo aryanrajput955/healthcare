@@ -1,68 +1,45 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { /* useEffect, useRef */ } from 'react'
 import Link from 'next/link'
 import { Phone, Mail, MapPin, Shield, FileText, Clock, Headphones, Database, FormInput, Facebook, Twitter, Linkedin, Instagram, ArrowRight, Heart } from 'lucide-react'
 
-gsap.registerPlugin(ScrollTrigger)
-
 export default function Footer() {
-  const footerRef = useRef(null)
+  // const footerRef = useRef(null) -- removed ref used for animations
 
-  useEffect(() => {
-    gsap.fromTo(footerRef.current.querySelectorAll('.footer-section'), 
-      { opacity: 0, y: 30 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.8, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: "top 90%",
-        }
-      }
-    )
-  }, [])
+  // remove useEffect animation block
 
   const services = [
-    { name: 'Insurance Claims Processing', href: '#services', icon: Shield },
-    { name: 'Rejected Claims Recovery', href: '#services', icon: FileText },
-    { name: 'Claims Delay Resolution', href: '#services', icon: Clock },
-    { name: 'Technical Support', href: '#services', icon: Headphones },
-    { name: 'CMS Portal Development', href: '#services', icon: Database },
-    { name: 'Form Processing', href: '#services', icon: FormInput }
+    { name: 'Insurance Claims Processing', href: '/services', icon: Shield },
+    { name: 'Rejected Claims Recovery', href: '/services', icon: FileText },
+    { name: 'Claims Delay Resolution', href: '/services', icon: Clock },
+    { name: 'Technical Support', href: '/services', icon: Headphones },
+    { name: 'CMS Portal Development', href: '/services', icon: Database },
+    { name: 'Form Processing', href: '/services', icon: FormInput }
   ]
 
   const quickLinks = [
-    { name: 'About Us', href: '#about' },
-    { name: 'Our Team', href: '#team' },
-    // { name: 'Careers', href: '#careers' },
-  //   { name: 'Blog', href: '#blog' },
-  //   { name: 'Case Studies', href: '#case-studies' },
-  //   { name: 'Resources', href: '#resources' }
+    { name: 'About Us', href: '/about-us' },
+    { name: 'Contact', href: '/contact' },
    ]
 
   const legalLinks = [
-    { name: 'Privacy Policy', href: '#privacy' },
-    { name: 'Terms of Service', href: '#terms' },
-    // { name: 'HIPAA Compliance', href: '#hipaa' },
-    { name: 'Security', href: '#security' },
-    { name: 'Cookie Policy', href: '#cookies' },
-    { name: 'Accessibility', href: '#accessibility' }
+    { name: 'Privacy Policy', href: '/privacy-policy' },
+    { name: 'Terms of Service', href: '/terms-of-service' },
+    // { name: 'Security', href: '#security' },
+    // { name: 'Cookie Policy', href: '#cookies' },
+    // { name: 'Accessibility', href: '#accessibility' }
   ]
 
   const socialLinks = [
-    { name: 'Facebook', href: '#', icon: Facebook },
-    { name: 'Twitter', href: '#', icon: Twitter },
-    { name: 'LinkedIn', href: '#', icon: Linkedin },
-    { name: 'Instagram', href: '#', icon: Instagram }
+    // { name: 'Facebook', href: '#', icon: Facebook },
+    // { name: 'Twitter', href: '#', icon: Twitter },
+    // { name: 'LinkedIn', href: '#', icon: Linkedin },
+    { name: 'Instagram', href: 'https://www.instagram.com/indiem_tech?igsh=MWo4a212OXEwMW5ydQ==', icon: Instagram }
   ]
 
   return (
-    <footer ref={footerRef} className="bg-[#354B62] text-white relative overflow-hidden">
+    <footer /* ref={footerRef} */ className="bg-[#354B62] text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#27A395]/20 to-[#33A8D3]/20"></div>
@@ -144,16 +121,6 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-
-              {/* Certifications */}
-              {/* <div className="mt-8">
-                <h5 className="font-semibold mb-3 text-white">Certifications</h5>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">HIPAA Compliant</span>
-                  <span className="bg-[#33A8D3] text-white text-xs px-2 py-1 rounded">SOC 2 Type II</span>
-                  <span className="bg-[#27A395] text-white text-xs px-2 py-1 rounded">ISO 27001</span>
-                </div>
-              </div> */}
             </div>
 
             {/* Newsletter & Legal */}
@@ -228,8 +195,6 @@ export default function Footer() {
               </div>
               
               <div className="flex items-center space-x-4 text-sm text-white/60">
-                {/* <span>🔒 Secure & HIPAA Compliant</span> */}
-                {/* <span>•</span> */}
                 <span>24/7 Support Available</span>
               </div>
             </div>
@@ -239,7 +204,7 @@ export default function Footer() {
         {/* Emergency Contact Banner */}
         <div className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-center">
+            <div className="flex flex-col sm:flex-row items:center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-center">
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
                 <span className="font-semibold">Emergency Support:</span>

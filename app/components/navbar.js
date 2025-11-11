@@ -56,7 +56,6 @@ export default function Navbar() {
   }, [isSideNavOpen])
 
   const enterpriseSolutions = [
-    { name: '360 Digital Solutions', href: '#enterprise-health-claim' },
     { name: 'Genuine Cashless', href: '/genuine-cashless-rejection-appeal' },
     { name: 'Health Claims Cashless', href: '/health-claim-cashless' },
     { name: 'Rejection Claims', href: '#enterprise-cashless' },
@@ -222,7 +221,7 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="#about" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
+            <Link href="/about-us" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
               About Us
             </Link>
             
