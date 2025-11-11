@@ -12,18 +12,37 @@ export default function ThankYouPage() {
   useEffect(() => {
     let remaining = 10;
     setSeconds(remaining);
+
+    // read and sanitize returnTo
+    const params = new URLSearchParams(window.location.search);
+    let returnTo = params.get('returnTo') || '/';
+
+    try {
+      // decode safely (if it was encoded)
+      returnTo = decodeURIComponent(returnTo);
+    } catch (e) {
+      returnTo = '/';
+    }
+
+    // allow only internal paths (start with single slash, no protocol, no double-slash)
+    if (!/^\/(?!\/)/.test(returnTo) || /https?:\/\//i.test(returnTo)) {
+      returnTo = '/';
+    }
+
+    // remove query string from URL so the raw param isn't left visible/indexed
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
     const id = setInterval(() => {
       remaining -= 1;
       setSeconds(remaining);
       if (remaining <= 0) {
         clearInterval(id);
-        // read returnTo from the browser URL at redirect time to avoid using
-        // useSearchParams (which requires Suspense during prerender)
-        const params = new URLSearchParams(window.location.search);
-        const returnTo = params.get('returnTo') || '/';
         router.push(returnTo);
       }
-    }, 5000);
+    }, 1000); // tick every second
+
     return () => clearInterval(id);
   }, [router]);
 
