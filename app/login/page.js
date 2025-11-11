@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { gsap } from 'gsap'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield, Users, Award } from 'lucide-react'
 import useAuthStore from '../lib/authstore'
 
-export default function LoginPage() {
+function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
@@ -207,7 +207,7 @@ export default function LoginPage() {
 
             <div className="mt-8 text-center">
               <p className="text-gray-600">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/signup" className="text-[#27A395] hover:text-[#33A8D3] font-semibold transition-colors hover:underline">
                   Create one now
                 </Link>
@@ -282,7 +282,7 @@ export default function LoginPage() {
 
             <div className="mt-12 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
               <p className="text-sm text-white/90 italic">
-                "This platform has revolutionized our claims processing workflow. We've seen a 40% increase in efficiency since implementation."
+                &quot;This platform has revolutionized our claims processing workflow. We&apos;ve seen a 40% increase in efficiency since implementation.&quot;
               </p> 
               <div className="mt-3">
                 <p className="font-semibold">Dr. Sarah Johnson</p>
@@ -295,3 +295,17 @@ export default function LoginPage() {
     </div>
   )
 }
+
+function LoginPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-[#27A395] via-[#33A8D3] to-[#354B62] flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+export default LoginPageWrapper

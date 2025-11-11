@@ -4,11 +4,12 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
-import Head from 'next/head';
 import { CheckCircle, FileText, Clock, Users, Shield, Database, ArrowRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Note: In App Router, metadata should be exported from a layout.js or page.js file
+// For this client component, we can't export metadata, so it should be handled in layout
 export default function ClaimsDelayResolutionPage() {
   const heroRef = useRef(null);
   const problemRef = useRef(null);
@@ -128,10 +129,6 @@ export default function ClaimsDelayResolutionPage() {
 
   return (
     <>
-      <Head>
-        <title>Resolve Delayed Insurance Claims - Get Your Settlement Fast</title>
-        <meta name="description" content="Tired of waiting for claim settlement? New specialized delay resolution service. Expert pressure tactics and legal support." />
-      </Head>
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section ref={heroRef} className="relative text-white py-20 lg:py-32 min-h-[70vh] flex items-center">
