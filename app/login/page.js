@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { gsap } from "gsap";
 import Link from "next/link";
 import {
   Eye,
@@ -14,66 +13,24 @@ import {
   Users,
   Award,
 } from "lucide-react";
-import useAuthStore from "../lib/authstore"; // adjust path if needed
+import useAuthStore from "../lib/authstore";
+
+// Floating animation keyframes
+const floatingKeyframes = `
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+`;
 
 function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
 
-  const containerRef = useRef(null);
-  const formRef = useRef(null);
-  const sidebarRef = useRef(null);
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
-
-  // --------------------------------------------------------------
-  // Animations
-  // --------------------------------------------------------------
-  useEffect(() => {
-    gsap.fromTo(
-      containerRef.current,
-      { opacity: 0, scale: 0.95 },
-      { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out" }
-    );
-
-    gsap.fromTo(
-      formRef.current.children,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        delay: 0.3,
-        ease: "power3.out",
-      }
-    );
-
-    gsap.fromTo(
-      sidebarRef.current.children,
-      { opacity: 0, x: -30 },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        delay: 0.5,
-        ease: "power3.out",
-      }
-    );
-
-    gsap.to(".floating-element", {
-      y: -20,
-      duration: 3,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-      stagger: 0.5,
-    });
-  }, []);
 
   // --------------------------------------------------------------
   // Form handling
@@ -112,8 +69,8 @@ function LoginContent() {
       setAuth(userData, token);
       console.log("Login successful:", data);
 
-      // Redirect to landing page
-      router.push("/");
+      // REDIRECT TO /journey
+      router.push("/journey");
     } catch (error) {
       console.error("Login error:", error);
       alert(error.message);
@@ -127,22 +84,22 @@ function LoginContent() {
   // --------------------------------------------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#27A395] via-[#33A8D3] to-[#354B62] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Inject keyframes */}
+      <style dangerouslySetInnerHTML={{ __html: floatingKeyframes }} />
+
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="floating-element absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
-        <div className="floating-element absolute top-40 right-32 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
-        <div className="floating-element absolute bottom-32 left-40 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-        <div className="floating-element absolute bottom-20 right-20 w-28 h-28 bg-white/8 rounded-full blur-xl"></div>
+        <div className="floating-element absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl animate-[float_3s_ease-in-out_infinite]"></div>
+        <div className="floating-element absolute top-40 right-32 w-24 h-24 bg-white/10 rounded-full blur-lg animate-[float_3s_ease-in-out_infinite_0.5s]"></div>
+        <div className="floating-element absolute bottom-32 left-40 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-[float_3s_ease-in-out_infinite_1s]"></div>
+        <div className="floating-element absolute bottom-20 right-20 w-28 h-28 bg-white/8 rounded-full blur-xl animate-[float_3s_ease-in-out_infinite_1.5s]"></div>
       </div>
 
-      <div
-        ref={containerRef}
-        className="relative bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full grid lg:grid-cols-2"
-      >
+      <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full grid lg:grid-cols-2 animate-in fade-in zoom-in duration-700">
         {/* Left Side – Form */}
         <div className="p-8 lg:p-12 flex flex-col justify-center">
-          <div ref={formRef}>
-            <div className="mb-8">
+          <div className="space-y-8">
+            <div className="animate-in slide-in-from-top duration-500">
               <Link
                 href="/"
                 className="inline-flex items-center text-[#354B62] hover:text-[#27A395] transition-colors mb-6 group"
@@ -160,11 +117,8 @@ function LoginContent() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-semibold text-gray-700"
-                >
+              <div className="space-y-2 animate-in slide-in-from-bottom duration-500 delay-200">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
                   Email Address
                 </label>
                 <div className="relative group">
@@ -183,11 +137,8 @@ function LoginContent() {
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold text-gray-700"
-                >
+              <div className="space-y-2 animate-in slide-in-from-bottom duration-500 delay-300">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                   Password
                 </label>
                 <div className="relative group">
@@ -207,17 +158,13 @@ function LoginContent() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
               {/* Remember & Forgot */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between animate-in fade-in duration-500 delay-400">
                 <label className="flex items-center group cursor-pointer">
                   <input
                     type="checkbox"
@@ -239,7 +186,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-4 rounded-xl font-semibold text-lg hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-4 rounded-xl font-semibold text-lg hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none animate-in fade-in duration-500 delay-500"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -253,7 +200,7 @@ function LoginContent() {
             </form>
 
             {/* Sign-up link */}
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center animate-in fade-in duration-500 delay-600">
               <p className="text-gray-600">
                 Don't have an account?{" "}
                 <Link
@@ -266,7 +213,7 @@ function LoginContent() {
             </div>
 
             {/* Divider */}
-            <div className="mt-8 relative">
+            <div className="mt-8 relative animate-in fade-in duration-500 delay-700">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
@@ -279,34 +226,17 @@ function LoginContent() {
 
             {/* Social buttons */}
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <button className="w-full cursor-pointer flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105">
+              <button className="w-full cursor-pointer flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105 animate-in slide-in-from-left duration-500 delay-800">
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Google
               </button>
-              <button className="cursor-pointer w-full flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+              <button className="cursor-pointer w-full flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:scale-105 animate-in slide-in-from-right duration-500 delay-800">
+                <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                   <rect x="2" y="2" width="20" height="20" fill="#F25022" />
                   <rect x="26" y="2" width="20" height="20" fill="#00A4EF" />
                   <rect x="2" y="26" width="20" height="20" fill="#7FBA00" />
@@ -321,8 +251,8 @@ function LoginContent() {
         {/* Right Side – Info Panel */}
         <div className="bg-gradient-to-br from-[#354B62] to-[#27A395] p-8 lg:p-12 text-white flex flex-col justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
-          <div ref={sidebarRef} className="relative z-10">
-            <div className="mb-8">
+          <div className="relative z-10 space-y-8">
+            <div className="animate-in slide-in-from-left duration-600 delay-200">
               <Shield className="w-16 h-16 mb-6 text-white/90" />
               <h2 className="text-3xl font-bold mb-4">
                 Secure Healthcare Management
@@ -334,36 +264,27 @@ function LoginContent() {
             </div>
 
             <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="bg-white/20 rounded-lg p-2 mt-1">
-                  <Users className="w-6 h-6" />
+              {[
+                { icon: Users, title: "Multi-User Access", desc: "Collaborate with your team seamlessly and securely" },
+                { icon: Award, title: "Industry Leading", desc: "Trusted by 500+ healthcare providers nationwide" },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-start space-x-4 animate-in slide-in-from-left duration-600"
+                  style={{ animationDelay: `${400 + i * 200}ms` }}
+                >
+                  <div className="bg-white/20 rounded-lg p-2 mt-1">
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
+                    <p className="text-white/80">{item.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">
-                    Multi-User Access
-                  </h3>
-                  <p className="text-white/80">
-                    Collaborate with your team seamlessly and securely
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-white/20 rounded-lg p-2 mt-1">
-                  <Award className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">
-                    Industry Leading
-                  </h3>
-                  <p className="text-white/80">
-                    Trusted by 500+ healthcare providers nationwide
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
 
-            <div className="mt-12 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
+            <div className="mt-12 p-6 bg-white/10 rounded-2xl backdrop-blur-sm animate-in slide-in-from-bottom duration-600 delay-700">
               <p className="text-sm text-white/90 italic">
                 "This platform has revolutionized our claims processing
                 workflow. We've seen a 40% increase in efficiency since
