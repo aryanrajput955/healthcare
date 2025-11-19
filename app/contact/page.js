@@ -131,7 +131,7 @@ export default function ContactPage() {
       icon: Phone,
       title: 'Call Us',
       description: 'Speak directly with our healthcare specialists',
-      contact: '+1 (555) 123-4567',
+      contact: '+91 9205862303',
       availability: 'Mon-Fri: 8AM-8PM EST',
       color: 'bg-[#27A395]'
     },
@@ -165,8 +165,8 @@ export default function ContactPage() {
     {
       city: 'New York',
       address: 'OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301',
-      phone: '+1 (555) 123-4567',
-      hours: 'Mon-Fri: 8AM-8PM EST'
+   
+      hours: 'Mon-Fri: 10AM-8PM IST'
     },
 
   ]
@@ -197,10 +197,7 @@ export default function ContactPage() {
               Ready to transform your healthcare operations? Our team of experts is here to help you streamline your processes and improve patient outcomes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="flex items-center space-x-2 text-white/90">
-                <Shield className="w-5 h-5" />
-                <span>HIPAA Compliant</span>
-              </div>
+          
               <div className="flex items-center space-x-2 text-white/90">
                 <Headphones className="w-5 h-5" />
                 <span>24/7 Support</span>
@@ -475,10 +472,7 @@ export default function ContactPage() {
                           <MapPin className="w-4 h-4 mt-1 flex-shrink-0" />
                           <span className="text-sm">{office.address}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-sm">{office.phone}</span>
-                        </div>
+                     
                         <div className="flex items-center space-x-2">
                           <Clock className="w-4 h-4 flex-shrink-0" />
                           <span className="text-sm">{office.hours}</span>
@@ -497,7 +491,7 @@ export default function ContactPage() {
                 </p>
                 <div className="flex items-center space-x-3 text-red-800 font-semibold">
                   <Phone className="w-5 h-5" />
-                  <span>+1 (555) 911-HELP</span>
+                  <span>+91 9205862303</span>
                 </div>
                 <p className="text-red-600 text-sm mt-2">Available 24/7 for emergency support</p>
               </div>

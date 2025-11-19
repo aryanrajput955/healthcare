@@ -1,17 +1,20 @@
+import React, { Suspense } from "react";
 import FormComponent from "../../components/form";
 
-// Generate static params for a range of form IDs since formId can be any number
+// Generate static params — key MUST match the dynamic folder name [formID]
 export async function generateStaticParams() {
-  const formIds = [];
-  
-  // Generate form IDs from 1 to 100 to cover most common cases
+  const formIDs = [];
   for (let i = 1; i <= 1000; i++) {
-    formIds.push({ formID: i.toString() });
+    formIDs.push({ formID: i.toString() });
   }
-  
-  return formIds;
+  return formIDs;
 }
 
+// Keep this file as a server component but wrap the client component in Suspense
 export default function FormPage({ params }) {
-  return <FormComponent formId={params.formID} />;
+  return (
+    <Suspense fallback={<div className="p-8">Loading form...</div>}>
+      <FormComponent formId={params.formID} />
+    </Suspense>
+  );
 }

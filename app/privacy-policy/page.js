@@ -274,7 +274,7 @@ export default function PrivacyPolicy() {
                 <li>Regular security audits and vulnerability assessments</li>
                 <li>Employee training on data protection and confidentiality</li>
                 <li>Secure backup and disaster recovery procedures</li>
-                <li>Compliance with ISO 27001:2013 standards (if applicable)</li>
+                {/* <li>Compliance with ISO 27001:2013 standards (if applicable)</li> */}
               </ul>
 
               <h3 className="text-xl font-medium text-[#33A8D3] mt-6 mb-2">7.2 Your Responsibility</h3>

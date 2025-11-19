@@ -462,7 +462,7 @@ export default function HomePage() {
                 <Phone className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Call Us</h3>
-              <p className="text-white/80">+1 (555) 123-4567</p>
+              <p className="text-white/80">+91 9205862303</p>
             </div>
             
             <div className="text-center">
