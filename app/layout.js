@@ -6,33 +6,33 @@ import { AuthProvider } from "./authprovider";
 import { Metadata } from "next";
 
 export const metadata = {
-  metadataBase: new URL("https://www.indiem.tech"), // ✅ Add this line
-  title: "Expert Health Insurance Claims Service Patients | Indiem",
+  metadataBase: new URL("https://www.claimtrue.in"), // ✅ Add this line
+  title: "Expert Health Insurance Claims Service Patients | ClaimTrue",
   description:
     "Specialized healthcare claims service for hospitals and patients in India. Expert processing, appeals, faster settlements. Risk-free consultation available.",
   keywords:
     "health insurance claims service, cashless claims processing, insurance claim appeals, health claim reimbursement, claim rejection recovery",
   openGraph: {
-    title: "Expert Health Insurance Claims Service Patients | Indiem",
+    title: "Expert Health Insurance Claims Service Patients | ClaimTrue",
     description:
       "Trusted experts in healthcare insurance claims for hospitals and patients. Get fast reimbursements, appeal support, and cashless claim assistance.",
-    url: "https://indiem.tech/",
-    siteName: "Indiem",
+    url: "https://claimtrue.in/",
+    siteName: "ClaimTrue",
     images: [
       {
-        url: "/logo.png", // can stay relative now because metadataBase is defined
+        url: "/claimstruelogo.png", // can stay relative now because metadataBase is defined
         width: 1200,
         height: 630,
-        alt: "Indiem Health Insurance Claims Service",
+        alt: "ClaimTrue Health Insurance Claims Service",
       },
     ],
     locale: "en_IN",
     type: "website",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/claimstruelogo.png",
+    shortcut: "/claimstruelogo.png",
+    apple: "/claimstruelogo.png",
   },
 };
 

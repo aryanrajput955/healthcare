@@ -679,7 +679,7 @@ export default function TermsOfService() {
               </p>
               <p className="text-[#354B62] leading-relaxed mt-4">To Company:</p>
               <ul className="list-disc pl-6 space-y-2 text-[#354B62]">
-                <li>Indiem</li>
+                <li>ClaimTrue</li>
                 <li>Office No – 101, First Floor, Plot No. A-61, Sector-16, Noida, UP-201301</li>
                 <li>Email: shashank.agnihotri@indiem.tech </li>
               </ul>
@@ -797,7 +797,7 @@ export default function TermsOfService() {
                 For questions, concerns, or support regarding these Terms or our Services:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-[#354B62] mt-4">
-                <li>Indiem</li>
+                <li>ClaimTrue</li>
                 <li>Registered Office: Office No – 101, First Floor, Plot No. A-61, Sector-16, Noida, UP-201301</li>
                 <li>Email: contact@indiem.tech</li>
                 <li>Phone: +91 9675124370</li>

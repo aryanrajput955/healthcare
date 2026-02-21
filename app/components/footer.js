@@ -55,12 +55,12 @@ export default function Footer() {
             <div className="footer-section lg:col-span-1">
               <div className="flex items-center space-x-3 mb-6">
                 <img
-                  src="/logo.png" // Adjust the path to your logo file
+                  src="/claimstruelogo.png" // Adjust the path to your logo file
                   alt="Logo"
-                  className=" w-12 h-12  object-contain"
+                  className=" w-22 h-22  bg-white rounded-xl p-1 object-contain"
                 />
                 <div>
-                  <h3 className="text-xl font-bold">Indiem</h3>
+                  <h3 className="text-xl font-bold">ClaimTrue</h3>
                   <p className="text-white/70 text-sm">Professional Healthcare Management</p>
                 </div>
               </div>

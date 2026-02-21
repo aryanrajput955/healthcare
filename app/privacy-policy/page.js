@@ -454,7 +454,7 @@ export default function PrivacyPolicy() {
                 For any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-[#354B62] mt-4">
-                <li>Indiem</li>
+                <li>ClaimTrue</li>
                 <li>Email: shashank.agnihotri@indiem.tech</li>
                 <li>Phone: +91 9675124370</li>
                 <li>Address: Office No – 101, First Floor, Plot No. A-61, Sector-16, Noida, UP-201301</li>

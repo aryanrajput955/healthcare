@@ -122,8 +122,8 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo.png" alt="logo" className="w-10 h-10 object-contain" />
-              <span className="text-xl font-bold text-[#354B62]">Indiem</span>
+              <img src="/claimstruelogo.png" alt="logo" className="w-10 h-10 object-contain" />
+              <span className="text-xl font-bold text-[#354B62]">ClaimTrue</span>
             </Link>
 
             {/* Desktop Nav */}
