@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import Head from 'next/head';
-import { CheckCircle, FileText, Clock, Users, Shield, Database, ArrowRight } from 'lucide-react';
+import { CheckCircle, FileText, Clock, Users, Shield, Database, ArrowRight, Scale, Wallet, AlertCircle, Gavel, TrendingUp } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,121 +20,39 @@ export default function ClaimShortSettledPage() {
   const trialRef = useRef(null);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
     tl.fromTo(heroRef.current.querySelector('.hero-content'), 
-      { opacity: 0, y: 15 }, 
-      { opacity: 1, y: 0, duration: 0.5 }
-    )
-    .fromTo(heroRef.current.querySelectorAll('.hero-cta button'), 
-      { opacity: 0, y: 10 }, 
-      { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 }
+      { opacity: 0, y: 30 }, 
+      { opacity: 1, y: 0, duration: 1 }
     );
 
-    gsap.fromTo(problemRef.current.querySelectorAll('.problem-item'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: problemRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
+    const sections = [
+      { ref: problemRef, selector: '.problem-item' },
+      { ref: solutionRef, selector: '.solution-step' },
+      { ref: categoriesRef, selector: '.category-item' },
+      { ref: advantagesRef, selector: '.advantage-item' },
+      { ref: recoveryRef, selector: '.recovery-item' },
+      { ref: successRef, selector: '.success-item' },
+      { ref: trialRef, selector: '.trial-step' }
+    ];
 
-    gsap.fromTo(solutionRef.current.querySelectorAll('.solution-step'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: solutionRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(categoriesRef.current.querySelectorAll('.category-item'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: categoriesRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(advantagesRef.current.querySelectorAll('.advantage-item'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: advantagesRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(recoveryRef.current.querySelectorAll('.recovery-item'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: recoveryRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(successRef.current.querySelectorAll('.success-item'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: successRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(trialRef.current.querySelectorAll('.trial-step'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: trialRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
+    sections.forEach(({ ref, selector }) => {
+      gsap.fromTo(ref.current.querySelectorAll(selector), 
+        { opacity: 0, y: 30 }, 
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.8, 
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    });
 
     return () => {
       tl.kill();
@@ -145,122 +63,102 @@ export default function ClaimShortSettledPage() {
   return (
     <>
       <Head>
-        <title>Recover Short-Settled Insurance Claims - Get Your Full Amount</title>
-        <meta name="description" content="Don't accept partial claim payments. New specialized service to recover short-settled amounts with expert challenge strategies." />
+        <title>Recover Short-Settled Insurance Claims - Get Your Full Amount | Indiem</title>
+        <meta name="description" content="Did your insurance company pay less than your actual bill? We challenge unfair deductions and recover the short-settled amount for you." />
       </Head>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white selection:bg-[#27A395]/30">
         {/* Hero Section */}
-        <section ref={heroRef} className="relative text-white py-20 lg:py-32 min-h-[70vh] flex items-center">
-          <div className="absolute inset-0 bg-[url('/hospital-bg.jpg')] bg-cover bg-center z-0" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#354B62]/90 to-[#2C3E50]/90 z-1" />
-          <div className="relative z-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="hero-content text-center space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                They Paid You Less Than You Deserve. We’ll Get the Rest
-              </h1>
-              <p className="text-xl lg:text-2xl max-w-3xl mx-auto">
-                Expert service to challenge short-settled insurance claims and recover full amounts
-              </p>
-              <p className="text-lg italic text-white/80">
-                Healthcare expertise | Legal challenge strategies | No recovery, no fee
-              </p>
-              <div className="hero-cta flex justify-center gap-4">
-                <Link href="/signup">
-                  <button className="bg-[#27A395] hover:bg-[#229b87] text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 inline-flex items-center cursor-pointer hover:scale-105 hover:shadow-lg">
-                    Start Free Settlement Analysis
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
-                </Link>
-                <Link href="/contact">
-                  <button className="border-2 border-white/30 bg-white/10 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#354B62] transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg">
-                    Urgent Case? Call Now
-                  </button>
-                </Link>
+        <section ref={heroRef} className="relative text-white min-h-[65vh] flex items-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 bg-[url('/img4.webp')] bg-cover bg-center scale-105" />
+          <div className="absolute inset-0 bg-[#1e3347]/85 backdrop-blur-[2px] z-10" />
+          
+          <div className="relative z-30 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20 text-center">
+            <div className="hero-content space-y-6">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#27A395]">Zero-Risk Settlement Recovery</span>
               </div>
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+                Don't Accept <br />
+                <span className="text-[#27A395]">Partial Payments</span>
+              </h1>
+              <p className="text-lg lg:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed font-medium">
+                Insurers often apply arbitrary deductions. We challenge unfair short-settlements and ensure you get every rupee you're entitled to.
+              </p>
             </div>
           </div>
         </section>
 
         {/* Problem Statement Section */}
-        <section ref={problemRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Why Insurance Companies Pay Less Than Your Full Claim
-            </h2>
-            <div className="space-y-6 text-center mb-8">
-              <p className="text-lg text-gray-700">Industry Manipulation Tactics:</p>
-              <ul className="space-y-2 text-gray-700 text-lg">
-                <li>70%+ of settled claims are paid below actual eligible amounts</li>
-                <li>Average ₹50,000-3 Lakhs left on the table per case</li>
-                <li>85% of patients accept partial payment without questioning</li>
-                <li>Most short-settlements can be successfully challenged</li>
-              </ul>
+        <section ref={problemRef} className="py-24 bg-gray-50/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1/4 h-full bg-[#27A395]/5 skew-x-12 transform origin-left" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-6 tracking-tight">
+                Why Claims are <span className="text-red-500">Short-Settled</span>
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Insurers use complex jargon and "non-medical" exclusions to reduce payouts. 70% of settled claims leave significant eligible money on the table.
+              </p>
             </div>
-            <h3 className="text-2xl font-semibold text-[#33A8D3] text-center mb-6">Common Manipulation Tactics</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { icon: FileText, text: '"Policy Sub-limits Apply" - Hidden restrictions never properly explained' },
-                { icon: FileText, text: '"Standard Treatment Costs" - Arbitrary reductions below actual expenses' },
-                { icon: FileText, text: '"Network Hospital Rates" - Lower negotiated rates applied unfairly' },
-                { icon: FileText, text: '"Depreciation on Consumables" - Illegal deductions on new medical items' },
-                { icon: FileText, text: '"Non-Medical Expenses" - Legitimate costs suddenly excluded' },
-                { icon: FileText, text: '"Co-payment Clauses" - Incorrectly applied or miscalculated' },
+                { icon: Wallet, title: 'Room Rent Capping', text: 'Illegal deductions applied when hospitals charge slightly above your room-rent limit.' },
+                { icon: FileText, title: 'Consumable Cuts', text: 'Essential medical disposables unfairly marked as non-medical or disallowed.' },
+                { icon: Scale, title: 'Network Rates', text: 'Applying lower "negotiated rates" even when the hospital claims higher costs.' },
+                { icon: AlertCircle, title: 'Incorrect Copay', text: 'Forcing copayments that don\'t exist in your policy or miscalculating the ratios.' },
+                { icon: Clock, title: 'Post-Hospitalization', text: 'Arbitrary rejection of follow-up bills, medicines, and diagnostic tests.' },
+                { icon: TrendingUp, title: 'Incremental Penalty', text: 'Proportionate deductions on doctor fees, surgeries, and all bill components.' },
               ].map((item, index) => (
-                <div key={index} className="problem-item flex items-start space-x-4">
-                  <item.icon className="w-8 h-8 text-[#27A395] flex-shrink-0" />
-                  <p className="text-gray-700 text-lg">{item.text}</p>
+                <div key={index} className="problem-item group bg-white/80 backdrop-blur-sm p-8 rounded-3xl border border-gray-100 hover:border-[#27A395]/30 hover:shadow-2xl transition-all duration-300">
+                  <div className="w-14 h-14 rounded-2xl bg-[#27A395]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-[#27A395]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#354B62] mb-3">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">{item.text}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Challenge Process Section */}
-        <section ref={solutionRef} className="py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Systematic Short-Settlement Recovery
-            </h2>
-            <div className="space-y-12">
+        {/* Aggressive Strategy Section */}
+        <section ref={solutionRef} className="py-24 relative overflow-hidden bg-white">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-[#27A395]/5 -skew-x-12 transform origin-right" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-6">Our <span className="text-[#27A395]">Recovery Protocol</span></h2>
+              <p className="text-gray-600 text-lg">A line-by-line audit and clinical challenge to reclaim your lost settlement money.</p>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
               {[
                 {
-                  title: 'Step 1: Settlement Analysis',
-                  items: [
-                    'Original bill vs paid amount detailed comparison',
-                    'Policy coverage clause-by-clause review',
-                    'Deduction justification verification',
-                    'Calculation error identification',
-                    'Additional recovery potential assessment',
-                  ],
+                  title: 'Line-by-Line Audit',
+                  items: ['Original bill vs payout gap', 'Policy clause verification', 'Deduction logic challenge', 'Recovery potential map'],
                 },
                 {
-                  title: 'Step 2: Evidence Building',
-                  items: [
-                    'Medical necessity documentation',
-                    'Treatment protocol justification',
-                    'Cost benchmark research',
-                    'Policy interpretation legal research',
-                    'Expert medical opinions (if needed)',
-                  ],
+                  title: 'Clinical Justification',
+                  items: ['Doctor certification letters', 'Medical necessity audits', 'Cost benchmark reporting', 'Precedent law research'],
                 },
                 {
-                  title: 'Step 3: Recovery Action',
-                  items: [
-                    'Formal dispute filing with detailed evidence',
-                    'Additional amount calculation with interest',
-                    'Direct negotiation with settlement teams',
-                    'Senior management escalation',
-                    'Regulatory complaint (if needed)',
-                  ],
+                  title: 'Aggressive Recovery',
+                  items: ['Revised settlement filing', 'Grievance team negotiation', 'Ombudsman escalation', 'Legal interest penalty'],
                 },
               ].map((step, index) => (
-                <div key={index} className="solution-step">
-                  <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">{step.title}</h3>
-                  <ul className="grid sm:grid-cols-2 gap-4">
+                <div key={index} className="solution-step relative p-8 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all">
+                  <div className="absolute -top-4 left-8 bg-[#27A395] text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
+                    Stage {index + 1}
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#354B62] mt-4 mb-6">{step.title}</h3>
+                  <ul className="space-y-4">
                     {step.items.map((item, i) => (
-                      <li key={i} className="flex items-start space-x-2">
-                        <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                        <span className="text-gray-700">{item}</span>
+                      <li key={i} className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-[#27A395] mt-1 flex-shrink-0" />
+                        <span className="text-gray-600 font-medium">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -270,281 +168,113 @@ export default function ClaimShortSettledPage() {
           </div>
         </section>
 
-        {/* Common Short-Settlement Categories Section */}
-        <section ref={categoriesRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Where We Recover Additional Money
-            </h2>
-            <div className="grid lg:grid-cols-4 gap-12">
-              <div className="category-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Room Rent Manipulations</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Single/double room charges reduced to "general ward"',
-                    'ICU charges arbitrarily capped below actual',
-                    'Private room medical necessity ignored',
-                    'Sub-limit clauses applied incorrectly',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="category-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Treatment Cost Reductions</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Surgeon fees cut to "panel rates"',
-                    'Procedure costs capped below standard',
-                    'Diagnostic test fees reduced arbitrarily',
-                    'Consultation charges limited unfairly',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="category-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Consumables & Equipment</h3>
-                <ul className="space-y-2">
-                  {[
-                    'New medical devices artificially "depreciated"',
-                    'Life-saving equipment costs disallowed',
-                    'Surgical implants reduced to "basic" rates',
-                    'Essential consumables marked "non-medical"',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="category-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Hidden Exclusions</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Ambulance costs capped or denied',
-                    'Attendant charges disallowed',
-                    'Food and accommodation reduced',
-                    'Miscellaneous essential costs excluded',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+        {/* Categories Section */}
+        <section ref={categoriesRef} className="py-24 bg-[#1e3347] text-white overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-[#27A395] rounded-full blur-[120px]" />
           </div>
-        </section>
-
-        {/* Service Advantages Section */}
-        <section ref={advantagesRef} className="py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Why Choose Our New Service
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <h2 className="text-3xl lg:text-5xl font-bold text-center mb-16 underline decoration-[#27A395]/30 decoration-8 underline-offset-8">
+              Wealth Left on the Table
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { icon: Shield, title: 'Fresh Perspective', description: 'Latest knowledge of insurance tactics and counters' },
-                { icon: Users, title: 'Personal Attention', description: 'Founder directly reviews every case' },
-                { icon: FileText, title: 'Healthcare Specialization', description: 'Exclusive focus on medical claim disputes' },
-                { icon: CheckCircle, title: 'Risk-Free Service', description: 'Pay only when we recover additional money' },
-                { icon: Database, title: 'Transparent Process', description: 'Complete visibility into challenge strategy' },
-                { icon: Clock, title: 'Quick Action', description: 'Begin recovery process within 48 hours' },
+                {
+                  title: 'Room Rent',
+                  items: ['Incremental deletions', 'Sub-limit errors', 'ICU capping', 'Nursing charges'],
+                },
+                {
+                  title: 'Medical Costs',
+                  items: ['Surgeon fee cuts', 'OT charge reductions', 'Consultation caps', 'Diagnostic gaps'],
+                },
+                {
+                  title: 'Implants',
+                  items: ['Stent cost cuts', 'Joint replacement gaps', 'Device depreciation', 'Panel rate errors'],
+                },
+                {
+                  title: 'Non-Medical',
+                  items: ['Illegal item cuts', 'PPE kit reductions', 'Service charge gaps', 'Documentation fees'],
+                },
               ].map((item, index) => (
-                <div key={index} className="advantage-item bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-                  <div className="bg-[#27A395] w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                    <item.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-[#354B62] mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                <div key={index} className="category-item p-8 bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:bg-white/10 transition-all group text-center">
+                  <h3 className="text-xl font-bold text-[#27A395] mb-6">{item.title}</h3>
+                  <ul className="space-y-3">
+                    {item.items.map((point, i) => (
+                      <li key={i} className="text-white/60 text-xs font-medium">{point}</li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Recovery Strategy Section */}
-        <section ref={recoveryRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              How We Get Your Additional Money
-            </h2>
-            <div className="grid lg:grid-cols-3 gap-12">
-              <div className="recovery-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Documentation Challenge</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Line-by-line bill analysis',
-                    'Policy clause interpretation',
-                    'Medical necessity certification',
-                    'Cost justification research',
-                    'Legal precedent compilation',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="recovery-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Negotiation Tactics</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Direct insurance company engagement',
-                    'Settlement team pressure',
-                    'Senior management escalation',
-                    'Legal notice with calculations',
-                    'Regulatory complaint preparation',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="recovery-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Legal Leverage</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Consumer protection act enforcement',
-                    'IRDAI regulation violation documentation',
-                    'Ombudsman complaint filing',
-                    'Interest penalty calculations',
-                    'Court proceedings (if necessary)',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Success Examples Section */}
-        <section ref={successRef} className="py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Types of Cases We Can Help
-            </h2>
-            <div className="grid lg:grid-cols-3 gap-12">
-              <div className="success-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">High Recovery Potential</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Room rent sub-limit disputes',
-                    'Surgeon fee reductions',
-                    'Implant and device cost cuts',
-                    'Treatment necessity challenges',
-                    'Policy interpretation disputes',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="success-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Medium Recovery Potential</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Consumable depreciation disputes',
-                    'Diagnostic cost reductions',
-                    'Attendant charge denials',
-                    'Miscellaneous expense cuts',
-                    'Co-payment calculation errors',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="success-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Complex Recovery Cases</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Multiple policy coordination',
-                    'International treatment claims',
-                    'Experimental procedure disputes',
-                    'Group insurance complications',
-                    'Corporate policy conflicts',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        {/* Why Choose Us Section */}
+        <section ref={advantagesRef} className="py-24 relative overflow-hidden bg-white">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-[#27A395]/5 -skew-x-12 transform origin-right" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-16">Why Trust Our <span className="text-[#27A395]">Audit Team</span></h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { icon: Shield, title: 'Clinical Depth', description: 'Doctors who understand medical bills better than insurance clerks.' },
+                { icon: Gavel, title: 'Legal Strength', description: 'Consumer protection experts specializing in insurance claim recovery.' },
+                { icon: TrendingUp, title: 'Max Recovery', description: 'Dedicated to finding every single rupee missed in the initial payout.' },
+                { icon: CheckCircle, title: 'No Upfront Fee', description: 'Zero risk. You only pay a small portion of the additional money we recover.' },
+                { icon: Database, title: 'Precedent Data', description: 'Access to thousands of solved cases to use as leverage in negotiations.' },
+                { icon: Users, title: 'Direct Advocacy', description: 'We talk to the insurers so you don\'t have to experience the frustration.' },
+              ].map((item, index) => (
+                <div key={index} className="advantage-item group bg-white/80 backdrop-blur-sm border border-gray-100 p-8 rounded-3xl hover:shadow-2xl transition-all">
+                  <div className="bg-[#27A395] w-14 h-14 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#354B62] mb-3">{item.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Getting Started Section */}
-        <section ref={trialRef} className="py-20 bg-gradient-to-br from-[#354B62] to-[#27A395] text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6">Free Settlement Analysis</h2>
-            <p className="text-lg mb-12 max-w-3xl mx-auto">
-              No upfront costs • No hidden fees • Pay only when we recover additional money
-            </p>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="trial-step">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">What We Need</h3>
-                <ul className="space-y-2 text-white/80">
-                  {[
-                    'Original claim settlement document',
-                    'Complete hospital bills',
-                    'Insurance policy copy',
-                    'All correspondence with insurer',
-                    'Medical records and reports',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="trial-step">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Our Free Analysis</h3>
-                <ul className="space-y-2 text-white/80">
-                  {[
-                    'Settlement accuracy verification',
-                    'Additional recovery potential',
-                    'Challenge strategy recommendation',
-                    'Timeline and process explanation',
-                    'Risk-free service proposal',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        <section ref={trialRef} className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[#1e3347] z-0" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1e3347] via-[#27A395]/20 to-[#1e3347] z-10" />
+          
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-12 leading-tight">
+               Recover What's <br />
+               <span className="text-[#27A395]">Rightfully Yours</span>
+            </h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
+              {[
+                { step: '01', title: 'Upload', text: 'Bills & documents' },
+                { step: '02', title: 'Audit', text: 'Find missing money' },
+                { step: '03', title: 'Challenge', text: 'Clinical legal case' },
+                { step: '04', title: 'Collect', text: 'Full payout done' },
+              ].map((item, index) => (
+                <div key={index} className="trial-step bg-white/5 backdrop-blur-md border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-[2rem]">
+                  <div className="text-2xl md:text-3xl font-black text-white/10 mb-2">{item.step}</div>
+                  <div className="text-lg md:text-xl font-bold mb-1">{item.title}</div>
+                  <div className="text-xs md:text-sm text-white/50">{item.text}</div>
+                </div>
+              ))}
             </div>
-            <Link href="/signup">
-              <button className="mt-12 bg-white text-[#354B62] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 inline-flex items-center cursor-pointer hover:scale-105 hover:shadow-lg">
-                Start Your Free Settlement Analysis
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-            </Link>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/signup" className="w-full sm:w-auto">
+                <button className="w-full bg-[#27A395] text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-[#229b87] transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-[1.02]">
+                  Analyze My Settlement
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+              </Link>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <button className="w-full bg-white/10 border border-white/20 backdrop-blur-md text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-white/20 transition-all duration-300">
+                  Speak to an Auditor
+                </button>
+              </Link>
+            </div>
           </div>
         </section>
       </div>

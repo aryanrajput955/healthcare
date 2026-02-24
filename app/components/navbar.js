@@ -76,9 +76,7 @@ export default function Navbar() {
   // 4. Menu data
   // -----------------------------------------------------------------------
   const enterpriseSolutions = [
-    { name: "Genuine Cashless", href: "/genuine-cashless-rejection-appeal" },
     { name: "Health Claims Cashless", href: "/health-claim-cashless" },
-    { name: "Rejection Claims", href: "#enterprise-cashless" },
     { name: "Pre-authorization Approval", href: "/pre-authorization-approval" },
   ];
 
@@ -135,7 +133,7 @@ export default function Navbar() {
                   onMouseLeave={closeEnterprise}
                   className="flex items-center text-[#354B62] hover:text-[#27A395] transition-colors font-medium py-2"
                 >
-                  Enterprise Solutions
+                  Hospital Solutions
                   <ChevronDown
                     className={`ml-1 h-4 w-4 transition-transform ${
                       isEnterpriseOpen ? "rotate-180" : ""
@@ -151,7 +149,7 @@ export default function Navbar() {
                   >
                     <div className="px-4 py-2 border-b border-gray-100">
                       <h3 className="text-sm font-semibold text-[#354B62] uppercase tracking-wider">
-                        Enterprise Solutions
+                        Hospital Solutions
                       </h3>
                     </div>
                     {enterpriseSolutions.map((s, i) => (
@@ -176,7 +174,7 @@ export default function Navbar() {
                   onMouseLeave={closePersonal}
                   className="flex items-center text-[#354B62] hover:text-[#27A395] transition-colors font-medium py-2"
                 >
-                  Personal Solutions
+                  Individual Solutions
                   <ChevronDown
                     className={`ml-1 h-4 w-4 transition-transform ${
                       isPersonalOpen ? "rotate-180" : ""
@@ -192,7 +190,7 @@ export default function Navbar() {
                   >
                     <div className="px-4 py-2 border-b border-gray-100">
                       <h3 className="text-sm font-semibold text-[#354B62] uppercase tracking-wider">
-                        Personal Solutions
+                        Individual Solutions
                       </h3>
                     </div>
                     {personalSolutions.map((s, i) => (

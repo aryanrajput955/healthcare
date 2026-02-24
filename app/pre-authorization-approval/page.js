@@ -19,106 +19,38 @@ export default function PreAuthorizationApprovalPage() {
   const trialRef = useRef(null);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
     tl.fromTo(heroRef.current.querySelector('.hero-content'), 
-      { opacity: 0, y: 15 }, 
-      { opacity: 1, y: 0, duration: 0.5 }
-    )
-    .fromTo(heroRef.current.querySelectorAll('.hero-cta button'), 
-      { opacity: 0, y: 10 }, 
-      { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 }
+      { opacity: 0, y: 30 }, 
+      { opacity: 1, y: 0, duration: 1 }
     );
 
-    gsap.fromTo(problemRef.current.querySelectorAll('.problem-item'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: problemRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
+    const sections = [
+      { ref: problemRef, selector: '.problem-item' },
+      { ref: solutionRef, selector: '.solution-step' },
+      { ref: benefitsRef, selector: '.benefit-item' },
+      { ref: managementRef, selector: '.management-item' },
+      { ref: techRef, selector: '.tech-item' },
+      { ref: trialRef, selector: '.trial-step' }
+    ];
 
-    gsap.fromTo(solutionRef.current.querySelectorAll('.solution-step'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: solutionRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(benefitsRef.current.querySelectorAll('.benefit-item'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: benefitsRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(managementRef.current.querySelectorAll('.management-item'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: managementRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(techRef.current.querySelectorAll('.tech-item'), 
-      { opacity: 0, x: -20 }, 
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: techRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
-
-    gsap.fromTo(trialRef.current.querySelectorAll('.trial-step'), 
-      { opacity: 0, y: 20 }, 
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: trialRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-      }
-    );
+    sections.forEach(({ ref, selector }) => {
+      gsap.fromTo(ref.current.querySelectorAll(selector), 
+        { opacity: 0, y: 30 }, 
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.8, 
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    });
 
     return () => {
       tl.kill();
@@ -129,114 +61,102 @@ export default function PreAuthorizationApprovalPage() {
   return (
     <>
       <Head>
-        <title>Expert Pre-Authorization Service - Faster Approvals, Fewer Rejections</title>
+        <title>Expert Pre-Authorization Service - Faster Approvals, Fewer Rejections | Indiem</title>
         <meta name="description" content="Specialized pre-auth service ensuring complete documentation and faster approvals. Personal expert attention for every case." />
       </Head>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white selection:bg-[#27A395]/30">
         {/* Hero Section */}
-        <section ref={heroRef} className="relative text-white py-20 lg:py-32 min-h-[70vh] flex items-center">
-          <div className="absolute inset-0 bg-[url('/hospital-bg.jpg')] bg-cover bg-center z-0" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#354B62]/90 to-[#2C3E50]/90 z-1" />
-          <div className="relative z-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="hero-content text-center space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                Get Pre-Authorizations Right the First Time
-              </h1>
-              <p className="text-xl lg:text-2xl max-w-3xl mx-auto">
-                Expert pre-auth service ensuring complete documentation and faster processing
-              </p>
-              <p className="text-lg italic text-white/80">
-                Healthcare specialization | Personal expert attention | Risk-free trial available
-              </p>
-              <div className="hero-cta flex justify-center gap-4">
-                <Link href="/signup">
-                  <button className="bg-[#27A395] hover:bg-[#229b87] text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 inline-flex items-center cursor-pointer hover:scale-105 hover:shadow-lg">
-                    Start Risk-Free Trial
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
-                </Link>
-                <Link href="/contact">
-                  <button className="border-2 border-white/30 bg-white/10 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#354B62] transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg">
-                    Contact Us
-                  </button>
-                </Link>
+        <section ref={heroRef} className="relative text-white min-h-[65vh] flex items-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 bg-[url('/img3.jpg')] bg-cover bg-center scale-105" />
+          <div className="absolute inset-0 bg-[#1e3347]/85 backdrop-blur-[2px] z-10" />
+          
+          <div className="relative z-30 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20 text-center">
+            <div className="hero-content space-y-6">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#27A395]">Specialized Pre-Auth Support</span>
               </div>
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+                Pre-Authorizations <br />
+                <span className="text-[#27A395]">Done Right</span>
+              </h1>
+              <p className="text-lg lg:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed font-medium">
+                Eliminate rejections and slash approval times with our expert-led documentation management service.
+              </p>
             </div>
           </div>
         </section>
 
         {/* Problem Statement Section */}
-        <section ref={problemRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Why Pre-Authorizations Get Delayed or Rejected
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section ref={problemRef} className="py-24 bg-gray-50/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1/4 h-full bg-[#27A395]/5 skew-x-12 transform origin-left" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-6 tracking-tight">
+                Why Requests Get <span className="text-red-500">Delayed</span>
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Incomplete documentation and lack of TPA-specific knowledge lead to revenue leakage and patient stress.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { icon: FileText, text: '60% of pre-auth requests require multiple submissions due to errors' },
-                { icon: Clock, text: 'Average 48-72 hours processing time causes patient anxiety' },
-                { icon: CheckCircle, text: '25% initial rejection rate due to incomplete documentation' },
-                { icon: Users, text: 'Hospital staff lack specialized knowledge of TPA requirements' },
-                { icon: Clock, text: 'Emergency cases get delayed due to documentation issues' },
+                { icon: FileText, title: 'Incomplete Filings', text: '60% of pre-auth requests require multiple submissions due to technical errors.' },
+                { icon: Clock, title: 'Processing Lags', text: 'Average 48-72 hours processing time causes critical discharge delays and anxiety.' },
+                { icon: CheckCircle, title: 'High Rejection', text: '25% initial rejection rate primarily due to missing clinical justification.' },
+                { icon: Users, title: 'Staff Gaps', text: 'Internal teams often lack specialized knowledge of evolving TPA requirements.' },
+                { icon: Clock, title: 'Emergency Delays', text: 'Critical cases get stuck in approval loops exactly when time is most precious.' },
+                { icon: Shield, title: 'Revenue Leakage', text: 'Claims denied at pre-auth stage often become unrecoverable hospital debt.' },
               ].map((item, index) => (
-                <div key={index} className="problem-item flex items-start space-x-4">
-                  <item.icon className="w-8 h-8 text-[#27A395] flex-shrink-0" />
-                  <p className="text-gray-700 text-lg">{item.text}</p>
+                <div key={index} className="problem-item group bg-white/80 backdrop-blur-sm p-8 rounded-3xl border border-gray-100 hover:border-[#27A395]/30 hover:shadow-2xl transition-all duration-300">
+                  <div className="w-14 h-14 rounded-2xl bg-[#27A395]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-[#27A395]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#354B62] mb-3">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">{item.text}</p>
                 </div>
               ))}
             </div>
-            <p className="text-center text-lg italic text-gray-600 mt-8">
-              These delays cost hospitals revenue and damage patient relationships.
-            </p>
           </div>
         </section>
 
         {/* Solution Overview Section */}
-        <section ref={solutionRef} className="py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Expert Pre-Authorization Management
-            </h2>
-            <div className="space-y-12">
+        <section ref={solutionRef} className="py-24 relative overflow-hidden bg-white">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-[#33A8D3]/5 -skew-x-12 transform origin-right" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-6">Expert <span className="text-[#33A8D3]">Management</span></h2>
+              <p className="text-gray-600 text-lg">We handle the complexity, so your clinical staff can focus on patient care.</p>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
               {[
                 {
                   title: 'Immediate Assessment',
-                  items: [
-                    'Patient eligibility verification within 2 hours',
-                    'Complete policy coverage analysis',
-                    'Treatment necessity evaluation',
-                    'Documentation requirement checklist',
-                    'Cost estimation and approval strategy',
-                  ],
+                  items: ['Eligibility verification (2hr)', 'Policy coverage analysis', 'Treatment evaluation', 'Cost estimation strategy'],
                 },
                 {
                   title: 'Perfect Documentation',
-                  items: [
-                    'Complete medical history compilation',
-                    'Treatment plan with medical justification',
-                    'Accurate cost estimation and breakdown',
-                    'Specialist consultation notes',
-                    'All required forms properly completed',
-                  ],
+                  items: ['Medical history compilation', 'Clinical justification reports', 'Specialist consultation notes', 'Form accuracy audit'],
                 },
                 {
                   title: 'Direct TPA Liaison',
-                  items: [
-                    'Personal submission to TPA representatives',
-                    'Real-time status monitoring',
-                    'Immediate query resolution',
-                    'Escalation to senior officials when needed',
-                    'Regular progress updates',
-                  ],
+                  items: ['Personal TPA submission', 'Real-time status monitoring', 'Immediate query resolution', 'Senior official escalation'],
                 },
               ].map((step, index) => (
-                <div key={index} className="solution-step">
-                  <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">{step.title}</h3>
-                  <ul className="grid sm:grid-cols-2 gap-4">
+                <div key={index} className="solution-step relative p-8 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all">
+                  <div className="absolute -top-4 left-8 bg-[#33A8D3] text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
+                    Phase 0{index + 1}
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#354B62] mt-4 mb-6">{step.title}</h3>
+                  <ul className="space-y-4">
                     {step.items.map((item, i) => (
-                      <li key={i} className="flex items-start space-x-2">
-                        <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                        <span className="text-gray-700">{item}</span>
+                      <li key={i} className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-[#27A395] mt-1 flex-shrink-0" />
+                        <span className="text-gray-600 font-medium">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -247,26 +167,28 @@ export default function PreAuthorizationApprovalPage() {
         </section>
 
         {/* Service Benefits Section */}
-        <section ref={benefitsRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Why Choose Our Pre-Auth Service
-            </h2>
+        <section ref={benefitsRef} className="py-24 bg-[#1e3347] text-white overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-[#27A395] rounded-full blur-[120px]" />
+          </div>
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h2 className="text-3xl lg:text-5xl font-bold mb-16">Why Partners <span className="text-[#27A395]">Choose Us</span></h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { icon: Shield, title: 'Specialized Expertise', description: 'Exclusive focus on health insurance pre-auths' },
-                { icon: Users, title: 'Personal Service', description: 'Direct access to founder and experts' },
-                { icon: FileText, title: 'Complete Documentation', description: 'No missing forms or incomplete submissions' },
-                { icon: Clock, title: 'Fast Response', description: '2-hour maximum response for urgent cases' },
-                { icon: Database, title: 'Transparent Process', description: 'Real-time updates on every case' },
-                { icon: CheckCircle, title: 'Risk-Free Trial', description: 'Test our service with pilot cases' },
+                { icon: Shield, title: 'Specialized Expertise', description: 'Exclusive focus on health insurance pre-auths with deep IRDAI knowledge.' },
+                { icon: Users, title: 'Direct Access', description: 'Founder-level involvement in complex case resolution.' },
+                { icon: FileText, title: 'Documentation Audit', description: 'Internal 3-point check before any submission to TPA.' },
+                { icon: Clock, title: 'Urgency Handling', description: '24/7 support for critical emergency pre-authorization needs.' },
+                { icon: Database, title: 'Smart Tracking', description: 'Proprietary dashboard to track every case status in real-time.' },
+                { icon: CheckCircle, title: 'Success Linked', description: 'We win only when you get the approval you need.' },
               ].map((item, index) => (
-                <div key={index} className="benefit-item bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-                  <div className="bg-[#27A395] w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                    <item.icon className="w-6 h-6 text-white" />
+                <div key={index} className="benefit-item group bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all">
+                  <div className="bg-[#27A395] w-14 h-14 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-[#354B62] mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -274,124 +196,105 @@ export default function PreAuthorizationApprovalPage() {
         </section>
 
         {/* Pre-Auth Management Section */}
-        <section ref={managementRef} className="py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Complete Pre-Auth Management
+        <section ref={managementRef} className="py-24 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1/3 h-full bg-[#27A395]/5 skew-x-12 transform origin-left" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] text-center mb-16 underline decoration-[#27A395]/30 decoration-8 underline-offset-8">
+              Comprehensive Support
             </h2>
-            <div className="grid lg:grid-cols-3 gap-12">
-              <div className="management-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Emergency Pre-Auth</h3>
-                <ul className="space-y-2">
-                  {[
-                    '24/7 availability for critical cases',
-                    '2-hour documentation completion',
-                    'Direct emergency hotline to TPAs',
-                    'Critical care specialist consultation',
-                    'Immediate approval pursuit',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="management-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Planned Procedure Pre-Auth</h3>
-                <ul className="space-y-2">
-                  {[
-                    '24-48 hour advance processing',
-                    'Treatment optimization consultation',
-                    'Cost-benefit analysis',
-                    'Multiple treatment option evaluation',
-                    'Insurance coverage maximization',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="management-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Complex Case Management</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Multi-specialty coordination',
-                    'Medical board consultations',
-                    'Insurance medical officer liaison',
-                    'Alternative treatment negotiations',
-                    'Maximum approval amount pursuit',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-5 h-5 text-[#27A395] flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div className="grid lg:grid-cols-3 gap-8">
+              {[
+                {
+                  title: 'Emergency Care',
+                  items: ['24/7 Critical Availability', '2-Hour Doc Completion', 'Direct Hotline to TPAs', 'Specialist Liaison'],
+                },
+                {
+                  title: 'Planned Procedures',
+                  items: ['48-Hour Advance Processing', 'Treatment Optimization', 'Coverage Maximization', 'Cost-Benefit Analysis'],
+                },
+                {
+                  title: 'Multi-Specialty Cases',
+                  items: ['Specialty Coordination', 'Insurance Med Officer Liaison', 'Alternative Negotiations', 'Board Consultations'],
+                },
+              ].map((item, index) => (
+                <div key={index} className="management-item p-10 bg-white/80 backdrop-blur-sm rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all group">
+                  <h3 className="text-2xl font-bold text-[#354B62] mb-8 group-hover:text-[#27A395] transition-colors">{item.title}</h3>
+                  <ul className="space-y-5">
+                    {item.items.map((point, i) => (
+                      <li key={i} className="flex items-center space-x-3 text-gray-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#27A395]" />
+                        <span className="font-medium">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Technology Platform Section */}
-        <section ref={techRef} className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#354B62] text-center mb-12">
-              Advanced Pre-Auth Tools
-            </h2>
-            <div className="grid lg:grid-cols-3 gap-12">
-              <div className="tech-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Real-time Dashboard</h3>
-                <p className="text-gray-700">Track all cases in one place</p>
-              </div>
-              <div className="tech-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Mobile Notifications</h3>
-                <p className="text-gray-700">Instant updates on case progress</p>
-              </div>
-              <div className="tech-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Document Management</h3>
-                <p className="text-gray-700">Secure cloud storage and retrieval</p>
-              </div>
-              <div className="tech-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">TPA Integration</h3>
-                <p className="text-gray-700">Direct connectivity where available</p>
-              </div>
-              <div className="tech-item">
-                <h3 className="text-2xl font-semibold text-[#33A8D3] mb-4">Analytics</h3>
-                <p className="text-gray-700">Performance insights and improvement recommendations</p>
-              </div>
+        <section ref={techRef} className="py-24 bg-gray-50/10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/4 h-full bg-[#33A8D3]/5 -skew-x-12 transform origin-right" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#354B62] mb-6">Advanced <span className="text-[#33A8D3]">Platform</span></h2>
+              <p className="text-gray-600 text-lg">Leverage our proprietary technology for 100% transparency.</p>
+            </div>
+            <div className="grid lg:grid-cols-3 gap-6">
+              {[
+                { title: 'Real-time Dashboard', text: 'Track every case status from submission to final approval in one central interface.' },
+                { title: 'Smart Alerts', text: 'Automated SMS and WhatsApp notifications for hospital TPA desk on case milestones.' },
+                { title: 'Document Vault', text: 'Secure, encrypted cloud storage for all patient medical records and submissions.' },
+              ].map((tech, index) => (
+                <div key={index} className="tech-item p-8 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-100 hover:shadow-lg transition-all text-center">
+                  <h3 className="text-xl font-bold text-[#354B62] mb-4">{tech.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{tech.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Getting Started Section */}
-        <section ref={trialRef} className="py-20 bg-gradient-to-br from-[#354B62] to-[#27A395] text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6">Simple Onboarding Process</h2>
-            <p className="text-lg mb-12 max-w-3xl mx-auto">
-              No setup fees • No long-term contracts • Cancel anytime
-            </p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section ref={trialRef} className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[#1e3347] z-0" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1e3347] via-[#27A395]/20 to-[#1e3347] z-10" />
+          
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-12 leading-tight">
+              Ready to <span className="text-[#27A395]">Fast-Track</span> Your<br />
+              Approvals?
+            </h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
               {[
-                'Step 1: Free consultation and system demo',
-                'Step 2: Select 3-5 pilot cases for trial',
-                'Step 3: Experience complete service quality',
-                'Step 4: Decide on ongoing partnership',
-              ].map((step, index) => (
-                <div key={index} className="trial-step bg-white/10 rounded-xl p-6">
-                  <div className="text-2xl font-bold text-[#33A8D3] mb-2">{step.split(':')[0]}</div>
-                  <p className="text-white/80">{step.split(':')[1].trim()}</p>
+                { step: '01', title: 'Consult', text: 'System demo' },
+                { step: '02', title: 'Select', text: '5 pilot cases' },
+                { step: '03', title: 'Execute', text: 'Quality check' },
+                { step: '04', title: 'Partner', text: 'Scalability' },
+              ].map((item, index) => (
+                <div key={index} className="trial-step bg-white/5 backdrop-blur-md border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-[2rem]">
+                  <div className="text-2xl md:text-3xl font-black text-white/10 mb-2">{item.step}</div>
+                  <div className="text-lg md:text-xl font-bold mb-1">{item.title}</div>
+                  <div className="text-xs md:text-sm text-white/50">{item.text}</div>
                 </div>
               ))}
             </div>
-            <Link href="/signup">
-              <button className="mt-12 bg-white text-[#354B62] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 inline-flex items-center cursor-pointer hover:scale-105 hover:shadow-lg">
-                Start Your Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-            </Link>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/signup" className="w-full sm:w-auto">
+                <button className="w-full bg-[#27A395] text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-[#229b87] transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-[1.02]">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+              </Link>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <button className="w-full bg-white/10 border border-white/20 backdrop-blur-md text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-white/20 transition-all duration-300">
+                  Talk to an Expert
+                </button>
+              </Link>
+            </div>
           </div>
         </section>
       </div>

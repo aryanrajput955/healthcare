@@ -9,14 +9,17 @@ export default function Footer() {
 
   // remove useEffect animation block
 
-  const services = [
-    { name: 'Insurance Claims Processing', href: '/services', icon: Shield },
-    { name: 'Rejected Claims Recovery', href: '/services', icon: FileText },
-    { name: 'Claims Delay Resolution', href: '/services', icon: Clock },
-    { name: 'Technical Support', href: '/services', icon: Headphones },
-    { name: 'CMS Portal Development', href: '/services', icon: Database },
-    { name: 'Form Processing', href: '/services', icon: FormInput }
-  ]
+  const hospitalSolutions = [
+    { name: "Health Claims Cashless", href: "/health-claim-cashless", icon: Shield },
+    { name: "Pre-authorization Approval", href: "/pre-authorization-approval", icon: FileText },
+  ];
+
+  const individualSolutions = [
+    { name: "Health Claim Reimbursement", href: "/health-claim-reimbursement", icon: Heart },
+    { name: "Rejected Claims Recovery", href: "/rejected-claims-recovery", icon: FileText },
+    { name: "Claims Delay Resolution", href: "/claim-delay-resolution", icon: Clock },
+    { name: "Claim Short-Settled", href: "/claim-short-settled", icon: Shield },
+  ];
 
   const quickLinks = [
     { name: 'About Us', href: '/about-us' },
@@ -89,20 +92,35 @@ export default function Footer() {
 
             {/* Services */}
             <div className="footer-section">
-              <h4 className="text-lg font-semibold mb-6 text-white">Our Services</h4>
-              <ul className="space-y-3">
-                {services.map((service, index) => (
-                  <li key={index}>
-                    <Link 
-                      href={service.href} 
-                      className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group"
-                    >
-                      <service.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      <span>{service.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <h4 className="text-lg font-semibold mb-6 text-white">Our Solutions</h4>
+              <div className="space-y-6">
+                <div>
+                  <h5 className="text-sm font-bold text-[#27A395] uppercase tracking-wider mb-3">Hospital</h5>
+                  <ul className="space-y-2">
+                    {hospitalSolutions.map((s, i) => (
+                      <li key={i}>
+                        <Link href={s.href} className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group">
+                          <s.icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm">{s.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-sm font-bold text-[#27A395] uppercase tracking-wider mb-3">Individual</h5>
+                  <ul className="space-y-2">
+                    {individualSolutions.map((s, i) => (
+                      <li key={i}>
+                        <Link href={s.href} className="flex items-center space-x-2 text-white/70 hover:text-[#27A395] transition-colors group">
+                          <s.icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm">{s.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
 
             {/* Quick Links */}

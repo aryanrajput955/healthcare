@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
-import { CheckCircle, Users, TrendingUp, Clock, Phone, Mail, ArrowRight, User } from 'lucide-react';
+import { CheckCircle, Shield, Award, FileCheck, Phone, Mail, ArrowRight, User } from 'lucide-react';
 
 export default function Hero() {
   const heroRef = useRef(null);
@@ -117,7 +117,7 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-8">
             <div className="hero-badge inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium bg-white/[0.08] border border-white/[0.15] backdrop-blur-sm">
               <div ref={pulseRef} className="w-2 h-2 rounded-full bg-[#27A395] mr-3" />
-              <span className="text-white/90">Trusted by 500+ Healthcare Organizations</span>
+              <span className="text-white/90">ISO Certified Healthcare Management Solutions</span>
             </div>
 
             <div>
@@ -137,29 +137,29 @@ export default function Hero() {
             <div className="flex flex-wrap gap-6">
               <div className="hero-stat flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-[#27A395]/20 border border-[#27A395]/30 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-[#27A395]" />
+                  <Shield className="w-5 h-5 text-[#27A395]" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold">98%</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Success Rate</div>
+                  <div className="text-xl font-bold">ISO 27001</div>
+                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
                 </div>
               </div>
               <div className="hero-stat flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-[#33A8D3]/20 border border-[#33A8D3]/30 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-[#33A8D3]" />
+                  <Award className="w-5 h-5 text-[#33A8D3]" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold">500+</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Partners</div>
+                  <div className="text-xl font-bold">ISO 9001</div>
+                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
                 </div>
               </div>
               <div className="hero-stat flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white/80" />
+                  <FileCheck className="w-5 h-5 text-white/80" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold">24/7</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Support</div>
+                  <div className="text-xl font-bold">ISO 20000</div>
+                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ export default function Hero() {
                   <p className="text-gray-500">We&apos;ll get back to you within 2 hours.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label htmlFor="hero-name" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Full Name *</label>
                     <div className="relative">
@@ -247,7 +247,7 @@ export default function Hero() {
                       className="w-full px-4 py-3 border text-gray-800 text-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50 resize-none"
                       placeholder="Tell us about your needs..." required></textarea>
                   </div>
-                  <button type="submit" onClick={handleSubmit} disabled={isSubmitting}
+                  <button type="submit" disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-3.5 rounded-xl font-semibold text-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#27A395]/20">
                     {isSubmitting ? (
                       <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>Sending...</>
@@ -256,7 +256,7 @@ export default function Hero() {
                     )}
                   </button>
                   <p className="text-[11px] text-gray-400 text-center">🔒 Your information is secure and will never be shared</p>
-                </div>
+                </form>
               )}
             </div>
           </div>

@@ -161,7 +161,7 @@ export default function AboutUsPage() {
   return (
     <div ref={pageRef} className="min-h-screen bg-white">
       {/* ═══════════════════════ HERO — Split Light Layout ═══════════════════════ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50/50 to-[#f0faf8]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50/50 to-[#f0faf8] min-h-[calc(100vh-64px)] flex items-center">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(circle at 1.5px 1.5px, #354B62 1px, transparent 0)", backgroundSize: "36px 36px" }} />
 
@@ -175,16 +175,16 @@ export default function AboutUsPage() {
           <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-[0.03]" style={{ background: "repeating-linear-gradient(135deg, transparent, transparent 60px, #27A395 60px, #27A395 61px)" }} />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 lg:pt-36 lg:pb-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 lg:py-16 w-full">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left — Story */}
             <div>
-              <div className="about-hero-badge inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#27A395]/10 text-[#27A395] mb-6">
+              <div className="about-hero-badge inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#27A395]/10 text-[#27A395] mb-4">
                 <Sparkles className="w-4 h-4 mr-2" />
                 Our Story
               </div>
 
-              <h1 className="about-hero-title text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-[#354B62] leading-[1.1] tracking-tight mb-4">
+              <h1 className="about-hero-title text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#354B62] leading-[1.1] tracking-tight mb-4">
                 Born from{" "}
                 <span className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] bg-clip-text text-transparent">Frustration.</span>
                 <br />
@@ -192,16 +192,16 @@ export default function AboutUsPage() {
                 <span className="bg-gradient-to-r from-[#33A8D3] to-[#27A395] bg-clip-text text-transparent">Expertise.</span>
               </h1>
 
-              <p className="about-hero-sub text-lg text-gray-500 leading-relaxed max-w-xl mb-5">
+              <p className="about-hero-sub text-base lg:text-lg text-gray-500 leading-relaxed max-w-xl mb-4">
                 We saw hospitals losing lakhs to rejected claims, patients drowning in paperwork, and a system that punished the people it was meant to protect. So we decided to fix it.
               </p>
 
-              <p className="about-hero-sub text-[15px] text-gray-400 leading-relaxed max-w-xl mb-8">
+              <p className="about-hero-sub text-sm text-gray-400 leading-relaxed max-w-xl mb-5">
                 ClaimTrue was founded by healthcare insiders who spent years navigating India&apos;s insurance maze from the inside — working with TPAs, insurers, and hospital billing teams. We know where claims break, why they get rejected, and exactly how to recover what you&apos;re owed.
               </p>
 
               {/* Founder quote */}
-              <blockquote className="about-hero-sub relative pl-5 border-l-[3px] border-[#27A395] mb-10">
+              <blockquote className="about-hero-sub relative pl-5 border-l-[3px] border-[#27A395] mb-6">
                 <p className="text-[15px] text-[#354B62] italic leading-relaxed">
                   &ldquo;Every rejected claim isn&apos;t just a number — it&apos;s a patient who paid premiums for years and deserves better. That&apos;s why we exist.&rdquo;
                 </p>
@@ -229,11 +229,11 @@ export default function AboutUsPage() {
             </div>
 
             {/* Right — Image Composition */}
-            <div className="about-hero-image relative hidden lg:block">
+            <div className="about-hero-image relative hidden lg:block max-w-md mx-auto">
               {/* Main image */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-300/40">
-                <div className="aspect-[4/5]">
-                  <img src="/img.jpeg" alt="ClaimTrue healthcare team at work" className="w-full h-full object-cover" />
+                <div className="aspect-[3/4] max-h-[420px]">
+                  <img src="/about.jpeg" alt="ClaimTrue healthcare team at work" className="w-full h-full object-cover" />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#354B62]/30 via-transparent to-transparent" />
               </div>
@@ -245,7 +245,7 @@ export default function AboutUsPage() {
                     <Award className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-lg font-extrabold text-[#354B62]">Founded 2014</div>
+                    <div className="text-lg font-extrabold text-[#354B62]">Founded 2025</div>
                     <div className="text-xs text-gray-400 font-medium">A Decade of Trust</div>
                   </div>
                 </div>
@@ -277,9 +277,9 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ MISSION & VISION ═══════════════════════ */}
-      <section className="mission-section py-24 lg:py-28 bg-gradient-to-b from-gray-50/80 to-white">
+      <section className="mission-section py-12 lg:py-16 bg-gradient-to-b from-gray-50/80 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="section-header text-center mb-16">
+          <div className="section-header text-center mb-10">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#27A395]/10 text-[#27A395] text-sm font-semibold mb-4">
               <Target className="w-4 h-4 mr-2" />
               Our Purpose
@@ -332,9 +332,9 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ CORE VALUES ═══════════════════════ */}
-      <section className="values-section py-24 lg:py-28">
+      <section className="values-section py-4 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="section-header text-center mb-16">
+          <div className="section-header text-center mb-10">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#33A8D3]/10 text-[#33A8D3] text-sm font-semibold mb-4">
               <Heart className="w-4 h-4 mr-2" />
               What We Stand For
@@ -360,7 +360,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ EXPERTISE ═══════════════════════ */}
-      <section className="expertise-section py-24 lg:py-28 relative overflow-hidden">
+      <section className="expertise-section py-12 lg:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#f8fafc] to-white" />
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #354B62 1px, transparent 0)", backgroundSize: "32px 32px" }} />
 
@@ -404,9 +404,9 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ WHAT MAKES US DIFFERENT ═══════════════════════ */}
-      <section className="difference-section py-24 lg:py-28">
+      <section className="difference-section py-4 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="section-header text-center mb-16">
+          <div className="section-header text-center mb-10">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#354B62]/10 text-[#354B62] text-sm font-semibold mb-4">
               <Sparkles className="w-4 h-4 mr-2" />
               Why ClaimTrue
@@ -435,7 +435,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ HOW WE WORK ═══════════════════════ */}
-      <section id="process-section" className="process-section py-24 lg:py-28 relative overflow-hidden">
+      <section id="process-section" className="process-section py-12 lg:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#f8fafc] to-white" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -472,9 +472,9 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ TRUST & COMPLIANCE ═══════════════════════ */}
-      <section className="compliance-section py-24 lg:py-28">
+      <section className="compliance-section py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="section-header text-center mb-16">
+          <div className="section-header text-center mb-10">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#354B62]/10 text-[#354B62] text-sm font-semibold mb-4">
               <Shield className="w-4 h-4 mr-2" />
               Trust & Security
@@ -499,7 +499,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* ═══════════════════════ CTA ═══════════════════════ */}
-      <section className="cta-section relative py-24 lg:py-28 overflow-hidden bg-gradient-to-br from-[#354B62] via-[#2C3E50] to-[#1e3347] text-white">
+      <section className="cta-section relative py-12 lg:py-16 overflow-hidden bg-gradient-to-br from-[#354B62] via-[#2C3E50] to-[#1e3347] text-white">
         <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
         <div className="absolute top-0 left-0 w-96 h-96 bg-[#27A395]/8 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#33A8D3]/6 rounded-full blur-3xl" />
