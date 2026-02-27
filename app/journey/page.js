@@ -17,6 +17,7 @@ import {
   FileImage,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
 import useAuthStore from '../lib/authstore';
 
 // ==================== File Upload Component with Progress Bar ====================
@@ -68,7 +69,7 @@ const FileUploadAction = ({ userJourneyId, actionId, actionResponses, onUploadSu
     }, 100);
 
     try {
-      const res = await fetch('https://api.indiem.tech/action-response', {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ACTION_RESPONSE}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -180,7 +181,7 @@ const UserJourneyTimeline = () => {
       setError(null);
       try {
         const authToken = token || 'mock-jwt-token';
-        const response = await fetch(`https://api.indiem.tech/user-journey/user/${user.id}`, {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USER_JOURNEY_BY_USER_ID(user.id)}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -215,7 +216,7 @@ const UserJourneyTimeline = () => {
     setCreating(true);
     try {
       const authToken = token || 'mock-jwt-token';
-      const res = await fetch('https://api.indiem.tech/user-journey', {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USER_JOURNEY}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -238,8 +239,8 @@ const UserJourneyTimeline = () => {
         const processedSteps = (uj.steps || []).map((step) => {
           const formCompleted = step.formId
             ? uj.formResponses?.some(
-                (fr) => fr.formId === step.formId && (fr.journeyId === uj.id || fr.userJourneyId === uj.id)
-              )
+              (fr) => fr.formId === step.formId && (fr.journeyId === uj.id || fr.userJourneyId === uj.id)
+            )
             : false;
 
           const actionCompleted = step.actionId
@@ -304,7 +305,7 @@ const UserJourneyTimeline = () => {
 
   if (loading) return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center"><div className="text-center"><div className="w-12 h-12 border-4 border-[#27A395] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><h3 className="text-lg font-semibold">Loading Journeys...</h3></div></div>;
 
-  if (error) return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center"><div className="text-center"><AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4"/><h3 className="text-xl font-bold">Error</h3><p className="text-gray-600">{error}</p><button onClick={() => window.location.reload()} className="mt-4 bg-[#27A395] text-white px-6 py-2 rounded-lg">Retry</button></div></div>;
+  if (error) return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center"><div className="text-center"><AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" /><h3 className="text-xl font-bold">Error</h3><p className="text-gray-600">{error}</p><button onClick={() => window.location.reload()} className="mt-4 bg-[#27A395] text-white px-6 py-2 rounded-lg">Retry</button></div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4">
@@ -316,10 +317,10 @@ const UserJourneyTimeline = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           {/* Stats Cards - unchanged */}
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Total Journeys</p><p className="text-2xl font-bold">{stats.total}</p></div><FileText className="w-8 h-8 text-blue-600"/></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Completed</p><p className="text-2xl font-bold text-green-600">{stats.completed}</p></div><CheckCircle className="w-8 h-8 text-green-600"/></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">In Progress</p><p className="text-2xl font-bold text-orange-600">{stats.inProgress}</p></div><Clock className="w-8 h-8 text-orange-600"/></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Avg Progress</p><p className="text-2xl font-bold text-purple-600">{stats.averageProgress.toFixed(0)}%</p></div><TrendingUp className="w-8 h-8 text-purple-600"/></div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Total Journeys</p><p className="text-2xl font-bold">{stats.total}</p></div><FileText className="w-8 h-8 text-blue-600" /></div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Completed</p><p className="text-2xl font-bold text-green-600">{stats.completed}</p></div><CheckCircle className="w-8 h-8 text-green-600" /></div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">In Progress</p><p className="text-2xl font-bold text-orange-600">{stats.inProgress}</p></div><Clock className="w-8 h-8 text-orange-600" /></div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Avg Progress</p><p className="text-2xl font-bold text-purple-600">{stats.averageProgress.toFixed(0)}%</p></div><TrendingUp className="w-8 h-8 text-purple-600" /></div></div>
         </div>
 
         <div className="flex space-x-1 bg-white rounded-xl p-1.5 shadow-md mb-6">
@@ -330,13 +331,13 @@ const UserJourneyTimeline = () => {
         <div className="flex justify-end mb-6">
           <div className="relative">
             <button onClick={() => setShowJourneyMenu(v => !v)} disabled={creating} className="bg-[#27A395] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
-              {creating ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"/> : <Plus className="w-5 h-5"/>}
-              Start New Journey <ChevronDown className={`w-5 h-5 transition-transform ${showJourneyMenu ? 'rotate-180' : ''}`}/>
+              {creating ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Plus className="w-5 h-5" />}
+              Start New Journey <ChevronDown className={`w-5 h-5 transition-transform ${showJourneyMenu ? 'rotate-180' : ''}`} />
             </button>
             {showJourneyMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border z-10">
-                <button onClick={() => { createNewJourney('CASHLESS'); setShowJourneyMenu(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"><Shield className="w-5 h-5 text-[#27A395]"/> Cashless Claim</button>
-                <button onClick={() => { createNewJourney('REIMBURSEMENT'); setShowJourneyMenu(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-t"><FileText className="w-5 h-5 text-[#33A8D3]"/> Reimbursement Claim</button>
+                <button onClick={() => { createNewJourney('CASHLESS'); setShowJourneyMenu(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"><Shield className="w-5 h-5 text-[#27A395]" /> Cashless Claim</button>
+                <button onClick={() => { createNewJourney('REIMBURSEMENT'); setShowJourneyMenu(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-t"><FileText className="w-5 h-5 text-[#33A8D3]" /> Reimbursement Claim</button>
               </div>
             )}
           </div>
@@ -344,7 +345,7 @@ const UserJourneyTimeline = () => {
 
         {activeTab === 'journeys' ? (
           processedJourneys.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl shadow-md"><FileText className="w-16 h-16 text-gray-400 mx-auto mb-4"/><h3 className="text-xl font-bold">No Journeys Started</h3><p className="text-gray-600">Begin your claim using the button above.</p></div>
+            <div className="text-center py-16 bg-white rounded-xl shadow-md"><FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" /><h3 className="text-xl font-bold">No Journeys Started</h3><p className="text-gray-600">Begin your claim using the button above.</p></div>
           ) : (
             <div className="space-y-6">
               {processedJourneys.map(journey => (
@@ -362,7 +363,7 @@ const UserJourneyTimeline = () => {
                     <div className="mb-6">
                       <div className="flex justify-between text-sm mb-2"><span>Progress</span><span>{journey.progress}%</span></div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] h-3 rounded-full transition-all" style={{ width: `${journey.progress}%` }}/>
+                        <div className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] h-3 rounded-full transition-all" style={{ width: `${journey.progress}%` }} />
                       </div>
                     </div>
 
@@ -374,7 +375,7 @@ const UserJourneyTimeline = () => {
                           <div key={step.id} className={`flex gap-4 p-5 rounded-lg border ${step.isCompleted || isActionCompleted ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'} ${step.isForm && !step.isCompleted ? 'cursor-pointer hover:shadow' : ''}`}
                             onClick={() => step.isForm && !step.isCompleted && handleFormClick(journey.id, step.formId)}>
                             <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold shadow-md ${step.isCompleted || isActionCompleted ? 'bg-green-500' : 'bg-[#27A395]'}`}>
-                              {step.isCompleted || isActionCompleted ? <CheckCircle className="w-7 h-7"/> : step.sequentialOrder}
+                              {step.isCompleted || isActionCompleted ? <CheckCircle className="w-7 h-7" /> : step.sequentialOrder}
                             </div>
                             <div className="flex-1">
                               <div className="flex justify-between items-center mb-2">
@@ -394,7 +395,7 @@ const UserJourneyTimeline = () => {
 
                               {isActionCompleted && journey.actionResponses?.filter(ar => ar.actionId === step.actionId).map((ar, i) => (
                                 <div key={i} className="mt-3 inline-flex items-center gap-2 bg-gray-100 px-3 py-1 rounded text-sm">
-                                  {ar.response.mimeType?.startsWith('image/') ? <FileImage className="w-4 h-4"/> : <FileText className="w-4 h-4"/>}
+                                  {ar.response.mimeType?.startsWith('image/') ? <FileImage className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                                   {ar.response.fileName}
                                 </div>
                               ))}
@@ -419,7 +420,7 @@ const UserJourneyTimeline = () => {
                 {cashlessJourneySteps.map(s => (
                   <div key={s.step} className="flex gap-5 p-5 rounded-lg border bg-gradient-to-r from-white to-gray-50 hover:shadow transition">
                     <div className={`${s.color} w-14 h-14 rounded-lg flex items-center justify-center text-white shadow-lg`}>
-                      <s.icon className="w-7 h-7"/>
+                      <s.icon className="w-7 h-7" />
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between mb-2">

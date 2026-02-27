@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 import {
   Eye,
   EyeOff,
@@ -17,7 +18,9 @@ import {
   Shield,
   CheckCircle,
 } from "lucide-react";
+import { API_BASE_URL, API_ENDPOINTS } from "../lib/constants";
 import useAuthStore from "../lib/authstore";
+import { decodeInvite } from "../lib/utils";
 
 // Floating animation keyframes (Tailwind-compatible)
 const floatingKeyframes = `
@@ -27,23 +30,52 @@ const floatingKeyframes = `
   }
 `;
 
-export default function SignupPage() {
+function SignupPageContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [razorpayDetails, setRazorpayDetails] = useState(null);
+  const [paymentConfig, setPaymentConfig] = useState({});
+
+  const searchParams = useSearchParams();
+  const rawInvite = searchParams.get("invite");
+
+  let inviteEmail = "";
+  let inviteRole = "";
+  let isInviteLink = false;
+
+  if (rawInvite) {
+    const decoded = decodeInvite(rawInvite);
+    if (decoded) {
+      inviteEmail = decoded.email;
+      inviteRole = decoded.role;
+      isInviteLink = true;
+    }
+  }
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    email: inviteEmail,
     organizationname: "",
     organizationtype: "",
+    roles: inviteRole,
     password: "",
     agreeToTerms: false,
   });
 
   const router = useRouter();
   const { setAuth } = useAuthStore();
+
+  // Fetch role-based prices from the backend whenever step 3 is reached
+  useEffect(() => {
+    if (currentStep === 3 && Object.keys(paymentConfig).length === 0) {
+      fetch(`${API_BASE_URL}/auth/payment-config`)
+        .then((r) => r.json())
+        .then((data) => setPaymentConfig(data))
+        .catch(() => { });
+    }
+  }, [currentStep]);
 
   // --------------------------------------------------------------
   // Form handling
@@ -62,7 +94,8 @@ export default function SignupPage() {
       formData.email.trim() !== "" &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
       formData.organizationname.trim() !== "" &&
-      formData.organizationtype.trim() !== ""
+      formData.organizationtype.trim() !== "" &&
+      formData.roles.trim() !== ""
     );
   };
 
@@ -73,8 +106,8 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.agreeToTerms) {
-      alert("You must agree to the Terms of Service and Privacy Policy.");
+    if (!razorpayDetails) {
+      alert("Please complete the payment to proceed.");
       return;
     }
 
@@ -86,9 +119,11 @@ export default function SignupPage() {
         password: formData.password,
         organizationname: formData.organizationname.trim(),
         organizationtype: formData.organizationtype.trim(),
+        roles: formData.roles,
+        ...razorpayDetails
       };
 
-      const response = await fetch("https://api.indiem.tech/auth/signup", {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SIGNUP}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -102,6 +137,7 @@ export default function SignupPage() {
           name: payload.name,
           email: payload.email,
           organizationname: payload.organizationname,
+          roles: payload.roles,
         };
         setAuth(userData, data.access_token);
       }
@@ -122,6 +158,53 @@ export default function SignupPage() {
     }
   };
 
+  const handlePayment = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CREATE_PAYMENT_ORDER}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: formData.roles }),
+      });
+      const order = await response.json();
+
+      if (!order || !order.id) {
+        throw new Error("Failed to initialize payment");
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_YourTestKeyHere",
+        amount: order.amount,
+        currency: order.currency,
+        name: "ClaimTrue",
+        description: "Registration Fee",
+        order_id: order.id,
+        handler: function (response) {
+          setRazorpayDetails({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+          });
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+        },
+        theme: {
+          color: "#27A395",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error(error);
+      alert("Payment initialization failed!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const organizationTypes = [
     "Hospital",
     "Clinic",
@@ -132,11 +215,22 @@ export default function SignupPage() {
     "Other",
   ];
 
+  const userRoles = [
+    { value: "ClaimTrue Corporate", label: "ClaimTrue Corporate" },
+    { value: "Branch Franchise", label: "Branch Franchise" },
+    { value: "Master Franchise", label: "Master Franchise" },
+    { value: "Elite", label: "Elite" },
+  ];
+
+  // selectedPrice is derived from the server-fetched paymentConfig — zero hardcoding
+  const selectedPrice = paymentConfig[formData.roles] ?? null;
+
   // --------------------------------------------------------------
   // Render
   // --------------------------------------------------------------
   return (
     <>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       {/* Inject floating animation keyframes */}
       <style dangerouslySetInnerHTML={{ __html: floatingKeyframes }} />
 
@@ -229,13 +323,13 @@ export default function SignupPage() {
                     Account Setup
                   </span>
                   <span className="text-sm font-medium text-[#27A395]">
-                    Step {currentStep} of 2
+                    Step {currentStep} of 3
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-gradient-to-r from-[#27A395] to-[#33A8D3] h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(currentStep / 2) * 100}%` }}
+                    style={{ width: `${(currentStep / 3) * 100}%` }}
                   ></div>
                 </div>
               </div>
@@ -257,9 +351,8 @@ export default function SignupPage() {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${
-                              formData.name.trim() === "" ? "border-gray-200" : "border-green-200"
-                            }`}
+                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.name.trim() === "" ? "border-gray-200" : "border-green-200"
+                              }`}
                             placeholder="Full name"
                             required
                           />
@@ -278,10 +371,9 @@ export default function SignupPage() {
                           id="email"
                           name="email"
                           value={formData.email}
-                          onChange={handleChange}
-                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${
-                            formData.email.trim() === "" ? "border-gray-200" : "border-green-200"
-                          }`}
+                          onChange={isInviteLink ? undefined : handleChange}
+                          readOnly={isInviteLink}
+                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${isInviteLink ? "border-green-200 bg-green-50 cursor-not-allowed opacity-80" : formData.email.trim() === "" ? "border-gray-200" : "border-green-200"}`}
                           placeholder="Enter your email address"
                           required
                         />
@@ -301,9 +393,8 @@ export default function SignupPage() {
                             name="organizationname"
                             value={formData.organizationname}
                             onChange={handleChange}
-                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${
-                              formData.organizationname.trim() === "" ? "border-gray-200" : "border-green-200"
-                            }`}
+                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.organizationname.trim() === "" ? "border-gray-200" : "border-green-200"
+                              }`}
                             placeholder="Your healthcare organization"
                             required
                           />
@@ -319,9 +410,8 @@ export default function SignupPage() {
                           name="organizationtype"
                           value={formData.organizationtype}
                           onChange={handleChange}
-                          className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${
-                            formData.organizationtype === "" ? "border-gray-200" : "border-green-200"
-                          }`}
+                          className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.organizationtype === "" ? "border-gray-200" : "border-green-200"
+                            }`}
                           required
                         >
                           <option value="">Select type</option>
@@ -334,15 +424,36 @@ export default function SignupPage() {
                       </div>
                     </div>
 
+                    <div className="space-y-2 animate-in slide-in-from-bottom duration-500 delay-650">
+                      <label htmlFor="roles" className="block text-sm font-semibold text-gray-700">
+                        Your Role
+                      </label>
+                      <select
+                        id="roles"
+                        name="roles"
+                        value={formData.roles}
+                        onChange={isInviteLink ? undefined : handleChange}
+                        disabled={isInviteLink}
+                        className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${isInviteLink ? "border-green-200 bg-green-50 cursor-not-allowed opacity-80" : formData.roles === "" ? "border-gray-200" : "border-green-200"}`}
+                        required
+                      >
+                        <option value="">Select your role</option>
+                        {userRoles.map((role) => (
+                          <option key={role.value} value={role.value}>
+                            {role.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     <button
                       type="button"
                       onClick={handleContinue}
                       disabled={!validateStep1()}
-                      className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:shadow-lg animate-in fade-in duration-500 delay-700 ${
-                        validateStep1()
-                          ? "bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white hover:from-[#33A8D3] hover:to-[#27A395] hover:scale-105"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
+                      className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:shadow-lg animate-in fade-in duration-500 delay-700 ${validateStep1()
+                        ? "bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white hover:from-[#33A8D3] hover:to-[#27A395] hover:scale-105"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
                     >
                       Continue to Security Setup
                     </button>
@@ -383,25 +494,22 @@ export default function SignupPage() {
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-center">
                           <div
-                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${
-                              formData.password.length >= 8 ? "bg-green-500" : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${formData.password.length >= 8 ? "bg-green-500" : "bg-gray-300"
+                              }`}
                           ></div>
                           At least 8 characters
                         </li>
                         <li className="flex items-center">
                           <div
-                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${
-                              /[A-Z]/.test(formData.password) ? "bg-green-500" : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${/[A-Z]/.test(formData.password) ? "bg-green-500" : "bg-gray-300"
+                              }`}
                           ></div>
                           One uppercase letter
                         </li>
                         <li className="flex items-center">
                           <div
-                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${
-                              /[0-9]/.test(formData.password) ? "bg-green-500" : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 transition-colors ${/[0-9]/.test(formData.password) ? "bg-green-500" : "bg-gray-300"
+                              }`}
                           ></div>
                           One number
                         </li>
@@ -446,21 +554,65 @@ export default function SignupPage() {
                         Back
                       </button>
                       <button
-                        type="submit"
-                        disabled={isLoading}
+                        type="button"
+                        onClick={() => setCurrentStep(3)}
+                        disabled={formData.password.length < 8 || !formData.agreeToTerms}
                         className="flex-1 bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-4 rounded-xl font-semibold text-lg hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        {isLoading ? (
-                          <div className="flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            Creating Account...
-                          </div>
-                        ) : (
-                          "Create Account"
-                        )}
+                        Continue to Payment
                       </button>
                     </div>
                   </>
+                )}
+
+                {/* Step 3 */}
+                {currentStep === 3 && (
+                  <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
+                    <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-100">
+                      <h3 className="text-xl font-bold text-[#354B62] mb-1">Registration Fee</h3>
+                      <p className="text-sm text-[#27A395] font-medium mb-3">{formData.roles}</p>
+                      <p className="text-gray-600 mb-4">
+                        A one-time setup fee is required to complete your registration and activate your account.
+                      </p>
+                      <div className="flex justify-between items-center text-lg font-semibold py-4 border-t-2 border-gray-200">
+                        <span>Total amount:</span>
+                        <span className="text-[#27A395]">
+                          {selectedPrice !== null ? `₹ ${selectedPrice.toLocaleString('en-IN')}.00` : "—"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-4">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(2)}
+                        className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-semibold text-lg hover:bg-gray-300 transition-all duration-300"
+                      >
+                        Back
+                      </button>
+
+                      {!razorpayDetails ? (
+                        <button
+                          type="button"
+                          onClick={handlePayment}
+                          disabled={isLoading}
+                          className="flex-1 bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-4 rounded-xl font-semibold text-lg hover:from-[#33A8D3] hover:to-[#27A395] transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                        >
+                          {isLoading
+                            ? "Processing..."
+                            : `Pay ₹${selectedPrice ? selectedPrice.toLocaleString('en-IN') : '...'}`}
+                        </button>
+                      ) : (
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="flex-1 bg-green-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                        >
+                          {isLoading ? "Creating..." : "Create Account"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 )}
               </form>
 
@@ -503,5 +655,13 @@ export default function SignupPage() {
         )}
       </div>
     </>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#27A395] border-t-transparent rounded-full animate-spin" /></div>}>
+      <SignupPageContent />
+    </Suspense>
   );
 }

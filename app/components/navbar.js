@@ -114,9 +114,8 @@ export default function Navbar() {
     <>
       {/* MAIN NAVBAR – blur only when not scrolled */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-lg" : "bg-white/95 backdrop-blur-sm"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-lg" : "bg-white/95 backdrop-blur-sm"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -137,9 +136,8 @@ export default function Navbar() {
                 >
                   Enterprise Solutions
                   <ChevronDown
-                    className={`ml-1 h-4 w-4 transition-transform ${
-                      isEnterpriseOpen ? "rotate-180" : ""
-                    }`}
+                    className={`ml-1 h-4 w-4 transition-transform ${isEnterpriseOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -178,9 +176,8 @@ export default function Navbar() {
                 >
                   Personal Solutions
                   <ChevronDown
-                    className={`ml-1 h-4 w-4 transition-transform ${
-                      isPersonalOpen ? "rotate-180" : ""
-                    }`}
+                    className={`ml-1 h-4 w-4 transition-transform ${isPersonalOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -219,12 +216,12 @@ export default function Navbar() {
 
               {/* Auth */}
               {token ? (
-                <button
-                  onClick={toggleSideNav}
-                  className="flex items-center cursor-pointer hover:scale-105 ease-in  text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                <Link
+                  href="/profile"
+                  className="flex items-center cursor-pointer hover:scale-105 ease-in text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
                 >
                   <User className="w-6 h-6" />
-                </button>
+                </Link>
               ) : (
                 <>
                   <Link href="/login" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
@@ -324,15 +321,13 @@ export default function Navbar() {
               </Link>
 
               {token ? (
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    toggleSideNav();
-                  }}
-                  className="block w-full cursor-pointer text-left px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium"
+                <Link
+                  href="/profile"
+                  className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium"
+                  onClick={() => setIsOpen(false)}
                 >
                   Profile
-                </button>
+                </Link>
               ) : (
                 <>
                   <Link href="/login" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>

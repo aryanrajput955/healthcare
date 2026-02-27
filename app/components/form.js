@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
+import { API_BASE_URL, API_ENDPOINTS } from "../lib/constants";
 import useAuthStore from '../lib/authstore';
 
 const FormComponent = ({ formId = 1 }) => {
@@ -29,7 +30,7 @@ const FormComponent = ({ formId = 1 }) => {
   const handleFetchForm = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`https://api.indiem.tech/forms/${formId}`, {
+      const res = await axios.get(`${API_BASE_URL}${API_ENDPOINTS.FORM_BY_ID(formId)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFetchedForm(res.data);
@@ -101,7 +102,7 @@ const FormComponent = ({ formId = 1 }) => {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://api.indiem.tech/form-response",
+        `${API_BASE_URL}${API_ENDPOINTS.FORM_RESPONSE}`,
         {
           userId: Number(user.id),
           userJourneyId: Number(userJourneyId),
@@ -215,9 +216,8 @@ const FormComponent = ({ formId = 1 }) => {
           <button
             type="submit"
             disabled={submitting}
-            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition ${
-              submitting ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition ${submitting ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+              }`}
           >
             {submitting ? "Submitting..." : "Submit Form"}
           </button>

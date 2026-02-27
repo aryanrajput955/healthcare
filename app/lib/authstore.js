@@ -59,7 +59,7 @@ const useAuthStore = create(
       setAuth: (user, token) => {
         const decodedToken = decodeJWT(token);
         const userWithId = decodedToken && decodedToken.sub
-          ? { ...user, id: decodedToken.sub }
+          ? { ...user, id: decodedToken.sub, roles: decodedToken.role ?? user.roles }
           : user;
         Store.setItem('user', userWithId);
         Store.setItem('token', token);

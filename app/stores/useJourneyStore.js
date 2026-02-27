@@ -1,6 +1,7 @@
 // stores/useJourneyStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
 
 // Ensure client-side execution for fetch operations
 const isClient = typeof window !== 'undefined';
@@ -31,7 +32,7 @@ const useJourneyStore = create(
           }
 
           const targetUserId = 1; // Hardcoded for testing; replace with user.id
-          const response = await fetch(`https://api.indiem.tech/user-journey/user/1`, {
+          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USER_JOURNEY_BY_USER_ID(targetUserId)}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,

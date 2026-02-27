@@ -1,9 +1,10 @@
 import axios from 'axios';
+const BASE_URL = 'https://api.indiem.tech';
 
 const options = {
   method: 'POST',
-  url: 'https://api.indiem.tech/forms',
-  headers: {'content-type': 'application/json'},
+  url: `${BASE_URL}/forms`,
+  headers: { 'content-type': 'application/json' },
   data: {
     tag: '["claims"]',
     fields: [

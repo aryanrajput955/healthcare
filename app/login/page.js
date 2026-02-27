@@ -13,6 +13,7 @@ import {
   Users,
   Award,
 } from "lucide-react";
+import { API_BASE_URL, API_ENDPOINTS } from "../lib/constants";
 import useAuthStore from "../lib/authstore";
 
 // Floating animation keyframes
@@ -44,7 +45,7 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.indiem.tech/auth/login", {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -69,8 +70,9 @@ function LoginContent() {
       setAuth(userData, token);
       console.log("Login successful:", data);
 
-      // REDIRECT TO /journey
-      router.push("/journey");
+      // REDIRECT TO /profile
+      router.push("/profile");
+
     } catch (error) {
       console.error("Login error:", error);
       alert(error.message);
