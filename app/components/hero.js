@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
-import { CheckCircle, Shield, Award, FileCheck, Phone, Mail, ArrowRight, User } from 'lucide-react';
+import { CheckCircle, Shield, Award, FileCheck, Phone, Mail, ArrowRight, User, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { submitForm, validateEmail, validatePhone } from '../lib/form-submission';
 
 export default function Hero() {
   const heroRef = useRef(null);
@@ -15,6 +17,9 @@ export default function Hero() {
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', serviceType: '', message: ''
   });
+  const [errorStatus, setErrorStatus] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const serviceTypes = [
     "Insurance Claims Processing", "Rejected Claims Recovery",
@@ -28,11 +33,38 @@ export default function Hero() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorStatus(null);
+
+    // Client-side validation
+    if (!formData.name.trim()) return setErrorStatus('Please enter your name.');
+    if (!validateEmail(formData.email)) return setErrorStatus('Please enter a valid email address.');
+    if (formData.phone && !validatePhone(formData.phone)) return setErrorStatus('Please enter a valid 10-digit phone number.');
+    if (!formData.serviceType) return setErrorStatus('Please select a service interest.');
+    if (!formData.message.trim()) return setErrorStatus('Please enter a message.');
+    if (formData.message.trim().length < 10) return setErrorStatus('Message must be at least 10 characters.');
+
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSubmitted(true);
+    const result = await submitForm(formData, 'Hero Service Consultation');
+    
+    if (result.success) {
+      setIsSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', serviceType: '', message: '' });
+      setTimeout(() => setIsSubmitted(false), 8000);
+    } else {
+      setErrorStatus(result.error);
+    }
     setIsSubmitting(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -134,36 +166,6 @@ export default function Hero() {
               Streamline your healthcare operations with enterprise-grade claims processing, custom CMS development, and comprehensive technical support.
             </p>
 
-            <div className="flex flex-wrap gap-6">
-              <div className="hero-stat flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#27A395]/20 border border-[#27A395]/30 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-[#27A395]" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">ISO 27001</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
-                </div>
-              </div>
-              <div className="hero-stat flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#33A8D3]/20 border border-[#33A8D3]/30 flex items-center justify-center">
-                  <Award className="w-5 h-5 text-[#33A8D3]" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">ISO 9001</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
-                </div>
-              </div>
-              <div className="hero-stat flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
-                  <FileCheck className="w-5 h-5 text-white/80" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">ISO 20000</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wider">Certified</div>
-                </div>
-              </div>
-            </div>
-
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Link href="/signup">
                 <button className="hero-cta-btn bg-gradient-to-r from-[#27A395] to-[#2BBD9E] text-white px-8 py-4 rounded-xl font-semibold text-lg inline-flex items-center justify-center shadow-lg shadow-[#27A395]/25">
@@ -233,13 +235,49 @@ export default function Hero() {
                   </div>
                   <div>
                     <label htmlFor="hero-serviceType" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Service Interest</label>
-                    <select id="hero-serviceType" name="serviceType" value={formData.serviceType} onChange={handleChange}
-                      className="w-full px-4 py-3 text-sm text-gray-500 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50">
-                      <option value="">Select a service</option>
-                      {serviceTypes.map((service) => (
-                        <option key={service} value={service}>{service}</option>
-                      ))}
-                    </select>
+                    <div className="relative" ref={dropdownRef}>
+                      <button
+                        type="button"
+                        id="hero-serviceType"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className={`w-full pl-10 pr-4 py-3 text-sm text-left border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50 flex items-center justify-between transition-all duration-200 ${!formData.serviceType ? 'text-gray-400' : 'text-gray-800'}`}
+                      >
+                        <FileCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <span className="truncate">
+                          {formData.serviceType || "Select a service"}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {isDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl shadow-black/10 overflow-hidden"
+                          >
+                            <div className="max-h-60 overflow-y-auto py-1 custom-scrollbar">
+                              {serviceTypes.map((service) => (
+                                <button
+                                  key={service}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({ ...formData, serviceType: service });
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-4 py-2.5 text-sm text-left hover:bg-gray-50 transition-colors flex items-center gap-2 ${formData.serviceType === service ? 'text-[#27A395] font-semibold bg-[#27A395]/5' : 'text-gray-700'}`}
+                                >
+                                  {formData.serviceType === service && <div className="w-1.5 h-1.5 rounded-full bg-[#27A395]" />}
+                                  {service}
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                   <div>
                     <label htmlFor="hero-message" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Message *</label>
@@ -247,8 +285,13 @@ export default function Hero() {
                       className="w-full px-4 py-3 border text-gray-800 text-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50 resize-none"
                       placeholder="Tell us about your needs..." required></textarea>
                   </div>
+                  {errorStatus && (
+                    <div className="bg-red-50 text-red-500 text-xs p-3 rounded-xl border border-red-100 mb-2">
+                      {errorStatus}
+                    </div>
+                  )}
                   <button type="submit" disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-3.5 rounded-xl font-semibold text-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#27A395]/20">
+                    className="w-full bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white py-3.5 rounded-xl font-semibold text-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#27A395]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
                     {isSubmitting ? (
                       <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>Sending...</>
                     ) : (

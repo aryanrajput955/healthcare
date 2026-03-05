@@ -7,8 +7,10 @@ import Link from "next/link";
 import {
   Phone, Mail, MapPin, Clock, Send, User, Building,
   MessageSquare, CheckCircle, Shield, Headphones,
-  ArrowRight, Sparkles, Calendar
+  ArrowRight, Sparkles, Calendar, ChevronDown, FileCheck
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { submitForm, validateEmail, validatePhone } from "../lib/form-submission";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,6 +65,9 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorStatus, setErrorStatus] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const pageRef = useRef(null);
 
@@ -123,21 +128,46 @@ export default function ContactPage() {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorStatus(null);
+
+    // Client-side validation
+    if (!formData.name.trim()) return setErrorStatus('Please enter your name.');
+    if (!validateEmail(formData.email)) return setErrorStatus('Please enter a valid email address.');
+    if (formData.phone && !validatePhone(formData.phone)) return setErrorStatus('Please enter a valid 10-digit phone number.');
+    if (!formData.serviceType) return setErrorStatus('Please select a service interest.');
+    if (!formData.message.trim()) return setErrorStatus('Please enter a message.');
+    if (formData.message.trim().length < 10) return setErrorStatus('Message must be at least 10 characters.');
+
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Contact form submitted:", formData);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
+    
+    // We can add the organization to the data sent to the API
+    const result = await submitForm(formData, 'Contact Page Inquiry');
+    
+    if (result.success) {
+      setIsSubmitted(true);
       setFormData({ name: "", email: "", phone: "", organization: "", serviceType: "", message: "" });
-    }, 3000);
+      // Reset submission status after 5 seconds to allow another message
+      setTimeout(() => setIsSubmitted(false), 5000);
+    } else {
+      setErrorStatus(result.error);
+    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -283,13 +313,49 @@ export default function ContactPage() {
 
                   <div className="form-group">
                     <label htmlFor="serviceType" className="block text-sm font-semibold text-gray-600 mb-1.5">What do you need help with?</label>
-                    <select id="serviceType" name="serviceType" value={formData.serviceType} onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50 focus:bg-white text-gray-600">
-                      <option value="">Select a service</option>
-                      {serviceTypes.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+                    <div className="relative" ref={dropdownRef}>
+                      <button
+                        type="button"
+                        id="serviceType"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className={`w-full pl-10 pr-10 py-3 text-sm text-left border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#27A395]/30 focus:border-[#27A395] outline-none bg-gray-50/50 focus:bg-white transition-all duration-200 flex items-center justify-between ${!formData.serviceType ? 'text-gray-400' : 'text-gray-700'}`}
+                      >
+                        <FileCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
+                        <span className="truncate">
+                          {formData.serviceType || "Select a service"}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {isDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl shadow-black/5 overflow-hidden"
+                          >
+                            <div className="max-h-60 overflow-y-auto py-1 custom-scrollbar">
+                              {serviceTypes.map((service) => (
+                                <button
+                                  key={service}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({ ...formData, serviceType: service });
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-4 py-2.5 text-sm text-left hover:bg-gray-50 transition-colors flex items-center gap-2 ${formData.serviceType === service ? 'text-[#27A395] font-semibold bg-[#27A395]/5' : 'text-gray-600'}`}
+                                >
+                                  {formData.serviceType === service && <div className="w-1.5 h-1.5 rounded-full bg-[#27A395]" />}
+                                  {service}
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -300,8 +366,15 @@ export default function ContactPage() {
                       required />
                   </div>
 
+                  {errorStatus && (
+                    <div className="bg-red-50 text-red-500 text-sm p-4 rounded-xl border border-red-100 mb-4 flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                       {errorStatus}
+                    </div>
+                  )}
+
                   <button type="submit" disabled={isSubmitting}
-                    className="contact-submit-btn w-full bg-gradient-to-r from-[#27A395] to-[#2BBD9E] text-white py-3.5 rounded-xl font-semibold text-base inline-flex items-center justify-center shadow-lg shadow-[#27A395]/20 disabled:opacity-60 disabled:cursor-not-allowed">
+                    className="contact-submit-btn w-full bg-gradient-to-r from-[#27A395] to-[#2BBD9E] text-white py-3.5 rounded-xl font-semibold text-base inline-flex items-center justify-center shadow-lg shadow-[#27A395]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed">
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />

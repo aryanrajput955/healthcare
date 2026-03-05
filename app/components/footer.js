@@ -84,8 +84,24 @@ export default function Footer() {
                   <span className="text-white/80">hello@indiem.tech</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin className="w-12 h-9  sm:w-20 h-10 text-[#27A395]" />
+                  <MapPin className="w-12 sm:w-20 h-10 text-[#27A395]" />
                   <span className="text-white/80 lowercase ">OFFICE NO – 101, FIRST FLOOR , AT PLOT NO. A-61, SECTOR-16, SEVEN WONDER BUSINESS CENTER, SECTOR-16, NOIDA, UP-201301</span>
+                </div>
+              </div>
+
+              {/* Certification Logos */}
+              <div className="mt-8 pt-6 border-t border-white/10 text-left">
+                <p className="text-xs font-semibold text-[#27A395] uppercase tracking-wider mb-5">Certified Excellence</p>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="hover:scale-110 transition-transform duration-300">
+                    <img src="/iso.png" alt="ISO 9001" className="h-18 w-auto object-contain brightness-110" />
+                  </div>
+                  <div className="hover:scale-110 transition-transform duration-300">
+                    <img src="/iso27001.png" alt="ISO 27001" className="h-18 w-auto object-contain brightness-110" />
+                  </div>
+                  <div className="hover:scale-110 transition-transform duration-300">
+                    <img src="/iso20000.webp" alt="ISO 20000" className="h-18 w-auto object-contain brightness-110" />
+                  </div>
                 </div>
               </div>
             </div>
