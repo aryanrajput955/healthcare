@@ -18,6 +18,11 @@ export const API_ENDPOINTS = {
   USER_JOURNEY: '/user-journey',
   USER_JOURNEY_BY_USER_ID: (userId) => `/user-journey/user/${userId}`,
   USER_JOURNEY_COMPLETE_ACTION: (journeyId, actionId) => `/user-journey/${journeyId}/complete-action/${actionId}`,
+
+  // Referee
+  REFEREE: '/referee',
+  REFEREE_BY_ID: (id) => `/referee/${id}`,
+  REFEREE_MY: '/referee/my',
 };
 
 // Helper function to build full API URL
