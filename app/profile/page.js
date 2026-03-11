@@ -109,15 +109,14 @@ export default function ProfilePage() {
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
                 console.error("Referee submission failed:", err);
-                alert(`Submission failed: ${err.message || res.statusText}`);
-                return;
+                throw new Error(err.message || res.statusText || "Submission failed");
             }
 
             const result = await res.json();
             console.log("Referee saved successfully:", result);
         } catch (e) {
             console.error("Network error submitting referee:", e);
-            alert("Network error. Please try again.");
+            throw e; // Re-throw so the modal can catch it and show inline error
         }
     };
 

@@ -16,7 +16,12 @@ import {
     Upload,
     AlertCircle,
     ShieldCheck,
+    CheckCircle,
+    Copy,
+    ClipboardCheck,
+    Loader2,
 } from "lucide-react";
+import { encodeInvite } from "../lib/utils";
 
 // ─── Step metadata ────────────────────────────────────────────────────────────
 const STEPS = [
@@ -441,12 +446,15 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
     const [formData, setFormData] = useState({ ...INITIAL_DATA, email: initialEmail });
     const [errors, setErrors] = useState({});
     const [touchedFields, setTouchedFields] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successLink, setSuccessLink] = useState(null);
+    const [copied, setCopied] = useState(false);
     const scrollRef = useRef(null);
 
     if (!isOpen) return null;
 
     const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) handleClose();
     };
 
     const handleChange = (field, value) => {
@@ -509,7 +517,7 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
         scrollToTop();
     };
 
-    const handleAddReferee = () => {
+    const handleAddReferee = async () => {
         const stepErrors = validateStep(currentStep, formData);
         if (Object.keys(stepErrors).length > 0) {
             setErrors(stepErrors);
@@ -517,16 +525,122 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
             setTouchedFields((prev) => ({ ...prev, ...allTouched }));
             return;
         }
-        onAddReferee?.({ ...formData, assignedRole: initialRole });
-        // Reset state
+
+        setIsSubmitting(true);
+        try {
+            await onAddReferee?.({ ...formData, assignedRole: initialRole });
+
+            // Build the invite link using the registrant's details
+            const token = encodeInvite({
+                email: formData.email,
+                role: initialRole,
+                name: formData.fullName,
+                organizationname: "",
+                organizationtype: "",
+            });
+            const origin = typeof window !== "undefined" ? window.location.origin : "";
+            const link = `${origin}/signup?invite=${token}`;
+            setSuccessLink(link);
+        } catch (err) {
+            console.error("Referee submission failed:", err);
+            setErrors({ _submit: err?.message || "Submission failed. Please try again." });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleCopyLink = async () => {
+        if (!successLink) return;
+        try {
+            await navigator.clipboard.writeText(successLink);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        } catch {
+            // Fallback for older browsers
+            const el = document.createElement("textarea");
+            el.value = successLink;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand("copy");
+            document.body.removeChild(el);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        }
+    };
+
+    const handleClose = () => {
+        // Reset all state then close
         setFormData({ ...INITIAL_DATA, email: initialEmail });
         setCurrentStep(1);
         setErrors({});
         setTouchedFields({});
+        setIsSubmitting(false);
+        setSuccessLink(null);
+        setCopied(false);
         onClose();
     };
 
     const StepIcon = STEPS[currentStep - 1].icon;
+
+    // ── Success view ──────────────────────────────────────────────────────────
+    if (successLink) {
+        return (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style={{ backgroundColor: "rgba(53,75,98,0.55)", backdropFilter: "blur(4px)" }}
+            >
+                <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-300">
+                    {/* Success header */}
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 pt-8 pb-6 text-white text-center">
+                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="w-9 h-9 text-white" />
+                        </div>
+                        <h2 className="text-xl font-bold leading-tight">
+                            The user <span className="underline underline-offset-2">{formData.fullName}</span> has been registered
+                        </h2>
+                        <p className="text-white/80 text-sm mt-1.5">
+                            Share the signup link below with the registrant.
+                        </p>
+                    </div>
+
+                    {/* Link section */}
+                    <div className="px-6 py-6 space-y-4">
+                        <div className="space-y-1.5">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Signup Link</p>
+                            <div className="flex items-center gap-2 p-3 bg-gray-50 border-2 border-gray-200 rounded-xl">
+                                <p className="flex-1 text-sm text-gray-700 break-all font-mono select-all">
+                                    {successLink}
+                                </p>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                                This link pre-fills the signup form with the registrant&apos;s details. Fields are locked and cannot be changed.
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={handleCopyLink}
+                            className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                                copied
+                                    ? "bg-green-500 text-white shadow-md"
+                                    : "bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white hover:from-[#33A8D3] hover:to-[#27A395] hover:shadow-lg hover:scale-[1.01]"
+                            }`}
+                        >
+                            {copied
+                                ? <><ClipboardCheck className="w-4 h-4" /> Copied!</>
+                                : <><Copy className="w-4 h-4" /> Copy Signup Link</>}
+                        </button>
+
+                        <button
+                            onClick={handleClose}
+                            className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold text-sm hover:border-[#27A395] hover:text-[#27A395] transition-all"
+                        >
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div
@@ -558,7 +672,7 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
                             )}
                         </div>
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white transition-colors flex-shrink-0"
                         >
                             <X className="w-5 h-5" />
@@ -624,19 +738,25 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
 
                 {/* ── Footer navigation ── */}
                 <div className="flex-shrink-0 border-t border-gray-100 px-6 py-4 bg-white space-y-3">
-                    {/* Error summary — always visible regardless of scroll position */}
-                    {Object.keys(errors).length > 0 && (
-                        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
-                            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                            <p className="text-xs text-red-600 font-medium">
-                                {Object.keys(errors).length} field{Object.keys(errors).length > 1 ? "s" : ""} need attention — please scroll up to review
-                            </p>
-                        </div>
-                    )}
+                    {/* Error summary — only show real (non-undefined) errors */}
+                    {(() => {
+                        const fieldErrors = Object.entries(errors).filter(([k, v]) => k !== "_submit" && v);
+                        if (fieldErrors.length === 0 && !errors._submit) return null;
+                        return (
+                            <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
+                                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                                <p className="text-xs text-red-600 font-medium">
+                                    {errors._submit
+                                        ? errors._submit
+                                        : `${fieldErrors.length} field${fieldErrors.length > 1 ? "s" : ""} need${fieldErrors.length === 1 ? "s" : ""} attention — please scroll up to review`}
+                                </p>
+                            </div>
+                        );
+                    })()}
                     <div className="flex items-center justify-between gap-3">
                         <button
                             onClick={handleBack}
-                            disabled={currentStep === 1}
+                            disabled={currentStep === 1 || isSubmitting}
                             className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold text-sm hover:border-[#27A395] hover:text-[#27A395] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600"
                         >
                             <ChevronLeft className="w-4 h-4" /> Back
@@ -645,16 +765,20 @@ export default function RefereeRegistrationModal({ isOpen, onClose, onAddReferee
                         {currentStep < STEPS.length ? (
                             <button
                                 onClick={handleNext}
-                                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white font-semibold text-sm hover:from-[#33A8D3] hover:to-[#27A395] hover:shadow-lg transition-all hover:scale-[1.02]"
+                                disabled={isSubmitting}
+                                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white font-semibold text-sm hover:from-[#33A8D3] hover:to-[#27A395] hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 Next <ChevronRight className="w-4 h-4" />
                             </button>
                         ) : (
                             <button
                                 onClick={handleAddReferee}
-                                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white font-semibold text-sm hover:from-[#33A8D3] hover:to-[#27A395] hover:shadow-lg transition-all hover:scale-[1.02]"
+                                disabled={isSubmitting}
+                                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#27A395] to-[#33A8D3] text-white font-semibold text-sm hover:from-[#33A8D3] hover:to-[#27A395] hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                             >
-                                <UserPlus className="w-4 h-4" /> Add Referee
+                                {isSubmitting
+                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                                    : <><UserPlus className="w-4 h-4" /> Add Referee</>}
                             </button>
                         )}
                     </div>

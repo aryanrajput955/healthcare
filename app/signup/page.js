@@ -43,6 +43,9 @@ function SignupPageContent() {
 
   let inviteEmail = "";
   let inviteRole = "";
+  let inviteName = "";
+  let inviteOrgName = "";
+  let inviteOrgType = "";
   let isInviteLink = false;
 
   if (rawInvite) {
@@ -50,15 +53,18 @@ function SignupPageContent() {
     if (decoded) {
       inviteEmail = decoded.email;
       inviteRole = decoded.role;
+      inviteName = decoded.name || "";
+      inviteOrgName = decoded.organizationname || "";
+      inviteOrgType = decoded.organizationtype || "";
       isInviteLink = true;
     }
   }
 
   const [formData, setFormData] = useState({
-    name: "",
+    name: inviteName,
     email: inviteEmail,
-    organizationname: "",
-    organizationtype: "",
+    organizationname: inviteOrgName,
+    organizationtype: inviteOrgType,
     roles: inviteRole,
     password: "",
     agreeToTerms: false,
@@ -350,13 +356,24 @@ function SignupPageContent() {
                             id="name"
                             name="name"
                             value={formData.name}
-                            onChange={handleChange}
-                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.name.trim() === "" ? "border-gray-200" : "border-green-200"
-                              }`}
+                            onChange={isInviteLink && inviteName ? undefined : handleChange}
+                            readOnly={isInviteLink && !!inviteName}
+                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg ${
+                              isInviteLink && inviteName
+                                ? "border-green-200 bg-green-50 cursor-not-allowed opacity-80"
+                                : formData.name.trim() === ""
+                                  ? "border-gray-200 bg-gray-50 focus:bg-white"
+                                  : "border-green-200 bg-gray-50 focus:bg-white"
+                            }`}
                             placeholder="Full name"
                             required
                           />
                         </div>
+                        {isInviteLink && inviteName && (
+                          <p className="text-xs text-[#27A395] font-medium flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" /> Pre-filled from registration
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -392,13 +409,24 @@ function SignupPageContent() {
                             id="organizationname"
                             name="organizationname"
                             value={formData.organizationname}
-                            onChange={handleChange}
-                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.organizationname.trim() === "" ? "border-gray-200" : "border-green-200"
-                              }`}
+                            onChange={isInviteLink && inviteOrgName ? undefined : handleChange}
+                            readOnly={isInviteLink && !!inviteOrgName}
+                            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg ${
+                              isInviteLink && inviteOrgName
+                                ? "border-green-200 bg-green-50 cursor-not-allowed opacity-80"
+                                : formData.organizationname.trim() === ""
+                                  ? "border-gray-200 bg-gray-50 focus:bg-white"
+                                  : "border-green-200 bg-gray-50 focus:bg-white"
+                            }`}
                             placeholder="Your healthcare organization"
                             required
                           />
                         </div>
+                        {isInviteLink && inviteOrgName && (
+                          <p className="text-xs text-[#27A395] font-medium flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" /> Pre-filled from registration
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-2">
@@ -409,9 +437,15 @@ function SignupPageContent() {
                           id="organizationtype"
                           name="organizationtype"
                           value={formData.organizationtype}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg bg-gray-50 focus:bg-white ${formData.organizationtype === "" ? "border-gray-200" : "border-green-200"
-                            }`}
+                          onChange={isInviteLink && inviteOrgType ? undefined : handleChange}
+                          disabled={isInviteLink && !!inviteOrgType}
+                          className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-[#27A395] focus:border-transparent outline-none transition-all duration-300 text-lg ${
+                            isInviteLink && inviteOrgType
+                              ? "border-green-200 bg-green-50 cursor-not-allowed opacity-80"
+                              : formData.organizationtype === ""
+                                ? "border-gray-200 bg-gray-50 focus:bg-white"
+                                : "border-green-200 bg-gray-50 focus:bg-white"
+                          }`}
                           required
                         >
                           <option value="">Select type</option>
@@ -421,6 +455,11 @@ function SignupPageContent() {
                             </option>
                           ))}
                         </select>
+                        {isInviteLink && inviteOrgType && (
+                          <p className="text-xs text-[#27A395] font-medium flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" /> Pre-filled from registration
+                          </p>
+                        )}
                       </div>
                     </div>
 
