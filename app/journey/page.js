@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import JourneyDetailView from './JourneyDetailView';
 import {
   CheckCircle,
   Clock,
@@ -18,17 +20,17 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
+// useSearchParams + Suspense wrapper is handled in Page() below
 import useAuthStore from '../lib/authstore';
+import { generateUserCode } from '../lib/userCode';
 
 // ==================== File Upload Component with Progress Bar ====================
-const FileUploadAction = ({ userJourneyId, actionId, actionResponses, onUploadSuccess }) => {
+const FileUploadAction = ({ userJourneyId, actionId, actionResponses, onUploadSuccess, token }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState('');
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-
-  const token = typeof window !== 'undefined' ? (localStorage.getItem('token') || 'mock-jwt-token') : 'mock-jwt-token';
 
   const isCompleted = actionResponses.some(
     (ar) => ar.actionId === actionId && ar.userJourneyId === userJourneyId
@@ -262,7 +264,10 @@ const UserJourneyTimeline = () => {
           return a.sequentialOrder - b.sequentialOrder;
         });
 
-        const progress = (uj.formResponses?.length > 0 || uj.actionResponses?.length > 0) ? 100 : 0;
+        const completedCount = processedSteps.filter((s) => s.isCompleted).length;
+        const progress = processedSteps.length > 0
+          ? Math.round((completedCount / processedSteps.length) * 100)
+          : 0;
 
         return {
           ...uj,
@@ -280,7 +285,9 @@ const UserJourneyTimeline = () => {
     const completed = processedJourneys.filter((j) => j.isCompleted).length;
     const inProgress = total - completed;
     const averageProgress = total > 0 ? processedJourneys.reduce((s, j) => s + j.progress, 0) / total : 0;
-    return { total, completed, inProgress, averageProgress };
+    const cashless = processedJourneys.filter((j) => j.journeyCode === 'CASHLESS').length;
+    const reimbursement = processedJourneys.filter((j) => j.journeyCode === 'REIMBURSEMENT').length;
+    return { total, completed, inProgress, averageProgress, cashless, reimbursement };
   }, [processedJourneys]);
 
   const handleFormClick = (userJourneyId, formId) => {
@@ -315,12 +322,13 @@ const UserJourneyTimeline = () => {
           <p className="text-lg text-gray-600">Track your insurance claims and understand the complete process</p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          {/* Stats Cards - unchanged */}
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Total Journeys</p><p className="text-2xl font-bold">{stats.total}</p></div><FileText className="w-8 h-8 text-blue-600" /></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Completed</p><p className="text-2xl font-bold text-green-600">{stats.completed}</p></div><CheckCircle className="w-8 h-8 text-green-600" /></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">In Progress</p><p className="text-2xl font-bold text-orange-600">{stats.inProgress}</p></div><Clock className="w-8 h-8 text-orange-600" /></div></div>
-          <div className="bg-white rounded-xl p-4 shadow-md border"><div className="flex justify-between"><div><p className="text-xs text-gray-600">Avg Progress</p><p className="text-2xl font-bold text-purple-600">{stats.averageProgress.toFixed(0)}%</p></div><TrendingUp className="w-8 h-8 text-purple-600" /></div></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">Total</p><p className="text-2xl font-bold text-gray-900">{stats.total}</p></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">Completed</p><p className="text-2xl font-bold text-green-600">{stats.completed}</p></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">In Progress</p><p className="text-2xl font-bold text-orange-500">{stats.inProgress}</p></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">Cashless</p><p className="text-2xl font-bold text-teal-600">{stats.cashless}</p></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">Reimbursement</p><p className="text-2xl font-bold text-amber-600">{stats.reimbursement}</p></div>
+          <div className="bg-white rounded-xl p-4 shadow-md border"><p className="text-xs text-gray-500 mb-1">Avg Progress</p><p className="text-2xl font-bold text-purple-600">{stats.averageProgress.toFixed(0)}%</p></div>
         </div>
 
         <div className="flex space-x-1 bg-white rounded-xl p-1.5 shadow-md mb-6">
@@ -352,11 +360,21 @@ const UserJourneyTimeline = () => {
                 <div key={journey.id} className="bg-white rounded-xl shadow-lg border overflow-hidden">
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-2xl font-bold">{journey.journeyCode === 'CASHLESS' ? 'Cashless Claim Journey' : 'Reimbursement Claim Journey'}</h3>
-                        <span className={`mt-2 inline-block px-4 py-1 rounded-full text-sm font-medium ${journey.journeyCode === 'CASHLESS' ? 'bg-teal-100 text-teal-800' : 'bg-amber-100 text-amber-800'}`}>
-                          {journey.journeyCode}
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${journey.journeyCode === 'CASHLESS' ? 'bg-teal-100 text-teal-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {journey.journeyCode}
+                          </span>
+                          <span className="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{generateUserCode(journey.userId)}</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">{journey.metadata?.patientName ? `${journey.metadata.patientName}'s ${journey.journeyCode === 'CASHLESS' ? 'Cashless' : 'Reimbursement'} Claim` : journey.journeyCode === 'CASHLESS' ? 'Cashless Claim Journey' : 'Reimbursement Claim Journey'}</h3>
+                        {journey.metadata?.diagnosis && <p className="text-sm text-gray-500 mt-0.5 truncate">{journey.metadata.diagnosis}</p>}
+                      </div>
+                      <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold capitalize ${{ completed: 'bg-green-100 text-green-700', in_progress: 'bg-cyan-100 text-cyan-700', intimation: 'bg-blue-100 text-blue-700', approved: 'bg-emerald-100 text-emerald-700', declined: 'bg-red-100 text-red-700' }[journey.status?.toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>{journey.status?.replace(/_/g, ' ') || 'Unknown'}</span>
+                        <button onClick={() => router.push(`/journey?id=${journey.id}`)} className="text-xs font-semibold text-[#27A395] hover:text-[#229584] flex items-center gap-1 transition-colors">
+                          View Details <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
 
@@ -390,6 +408,7 @@ const UserJourneyTimeline = () => {
                                   actionId={step.actionId}
                                   actionResponses={journey.actionResponses || []}
                                   onUploadSuccess={() => window.location.reload()}
+                                  token={token || ''}
                                 />
                               )}
 
@@ -443,4 +462,17 @@ const UserJourneyTimeline = () => {
   );
 };
 
-export default UserJourneyTimeline;
+function JourneyPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  if (id) return <JourneyDetailView id={id} />;
+  return <UserJourneyTimeline />;
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#27A395] border-t-transparent rounded-full animate-spin" /></div>}>
+      <JourneyPage />
+    </Suspense>
+  );
+}

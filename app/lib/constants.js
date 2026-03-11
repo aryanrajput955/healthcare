@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
   // User Journey
   USER_JOURNEY: '/user-journey',
   USER_JOURNEY_BY_USER_ID: (userId) => `/user-journey/user/${userId}`,
+  USER_JOURNEY_BY_ID: (id) => `/user-journey/${id}`,
   USER_JOURNEY_COMPLETE_ACTION: (journeyId, actionId) => `/user-journey/${journeyId}/complete-action/${actionId}`,
 
   // Referee

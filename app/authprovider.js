@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!isInitialized) return
 
-    const protectedRoutes = ['/dashboard', '/admin', '/profile', '/settings', '/claims', '/create-user-journey']
+    const protectedRoutes = ['/dashboard', '/admin', '/profile', '/settings', '/claims', '/create-user-journey', '/journey']
     const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
 
     if (isProtected && !token) {
