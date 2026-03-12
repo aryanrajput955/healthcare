@@ -1280,8 +1280,15 @@ export default function JourneyDetailView({ id }) {
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <StatusBadge status={journey.status} />
+                <button
+                  onClick={() => router.push(`/journey/logs?id=${journey.id}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/90 hover:text-white border border-white/30 hover:border-white/60 bg-white/10 hover:bg-white/20 transition-all text-xs font-semibold flex-shrink-0"
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  Logs
+                </button>
                 <button
                   onClick={() => router.push(`/journey/chat?id=${journey.id}`)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/90 hover:text-white border border-white/30 hover:border-white/60 bg-white/10 hover:bg-white/20 transition-all text-xs font-semibold flex-shrink-0"
