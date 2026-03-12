@@ -19,6 +19,10 @@ import {
   Building2,
   Stethoscope,
   Upload,
+  Paperclip,
+  Eye,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
 import useAuthStore from '../lib/authstore';
@@ -686,6 +690,468 @@ function StepResponseModal({ step, journey, token, userId, onClose, onSuccess })
   );
 }
 
+// ── Attachments helpers ────────────────────────────────────────────────────────
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+}
+
+function getMimeLabel(mimeType) {
+  if (!mimeType) return 'FILE';
+  return mimeType.split('/').pop()?.toUpperCase() || 'FILE';
+}
+
+// ── AttachmentsSection ─────────────────────────────────────────────────────────
+
+function AttachmentsSection({ journey, token, onRefresh }) {
+  const fileInputRef = useRef(null);
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState('');
+
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewFileData, setPreviewFileData] = useState(null);
+  const [previewFileUrl, setPreviewFileUrl] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const [previewError, setPreviewError] = useState('');
+
+  const files = journey?.metadata?.files || [];
+
+  const openUploadModal = () => {
+    setShowUploadModal(true);
+    setSelectedFile(null);
+    setFileName('');
+    setUploadError('');
+    setUploadProgress(0);
+  };
+
+  const closeUploadModal = () => {
+    if (uploading) return;
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setFileName('');
+    setUploadError('');
+    setUploadProgress(0);
+    setIsDragging(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      if (!fileName) setFileName(file.name.replace(/\.[^/.]+$/, ''));
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      if (!fileName) setFileName(file.name.replace(/\.[^/.]+$/, ''));
+    }
+  };
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !fileName || !journey?.id) return;
+    setUploading(true);
+    setUploadProgress(0);
+    setUploadError('');
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('name', fileName);
+
+    const interval = setInterval(() => {
+      setUploadProgress((p) => (p < 90 ? p + 10 : p));
+    }, 200);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/user-journey/${journey.id}/upload`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      clearInterval(interval);
+      if (!res.ok) throw new Error((await res.text()) || 'Upload failed');
+      setUploadProgress(100);
+      setTimeout(() => {
+        closeUploadModal();
+        onRefresh();
+      }, 500);
+    } catch (err) {
+      clearInterval(interval);
+      setUploadProgress(0);
+      setUploadError(err.message || 'Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const openPreview = async (file) => {
+    setShowPreviewModal(true);
+    setPreviewFileData(file);
+    setPreviewFileUrl(null);
+    setPreviewError('');
+    setLoadingPreview(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/user-journey/${journey.id}/files/presigned-urls`, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to fetch file URL');
+      const data = await res.json();
+      const match = data.files?.find((f) => f.fileName === file.fileName);
+      if (match?.presignedUrl) {
+        setPreviewFileUrl(match.presignedUrl);
+      } else {
+        throw new Error('File URL not found');
+      }
+    } catch (err) {
+      setPreviewError(err.message || 'Could not load preview');
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
+
+  const closePreview = () => {
+    setShowPreviewModal(false);
+    setPreviewFileData(null);
+    setPreviewFileUrl(null);
+    setPreviewError('');
+  };
+
+  return (
+    <>
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="font-bold text-gray-900 flex items-center gap-2 text-base">
+            <Paperclip className="w-5 h-5 text-[#27A395]" />
+            Attachments
+            {files.length > 0 && (
+              <span
+                className="text-xs font-bold text-white px-2.5 py-0.5 rounded-full"
+                style={{ background: 'linear-gradient(135deg, #27A395 0%, #33A8D3 100%)' }}
+              >
+                {files.length}
+              </span>
+            )}
+          </h2>
+          <button
+            onClick={openUploadModal}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #27A395 0%, #33A8D3 100%)' }}
+          >
+            <Upload className="w-4 h-4" />
+            Upload File
+          </button>
+        </div>
+
+        <div className="p-6">
+          {files.length === 0 ? (
+            <div className="text-center py-10 text-gray-400">
+              <Paperclip className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No attachments yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {files.map((file, i) => {
+                const isPdf = file.mimeType?.includes('pdf');
+                const isImage = file.mimeType?.startsWith('image/');
+                return (
+                  <div
+                    key={file.fileName || i}
+                    className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:shadow-sm transition-all"
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isPdf
+                          ? 'bg-red-100 text-red-600'
+                          : isImage
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'bg-gray-200 text-gray-500'
+                      }`}
+                    >
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {file.name || file.fileName}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {formatFileSize(file.fileSize)} · {getMimeLabel(file.mimeType)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => openPreview(file)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#27A395] text-white hover:bg-[#229b87] transition-colors flex-shrink-0"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Preview
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Upload Modal ── */}
+      {showUploadModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.55)' }}
+          onClick={(e) => e.target === e.currentTarget && closeUploadModal()}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div
+              className="flex items-center justify-between px-5 py-4"
+              style={{ background: 'linear-gradient(135deg, #354B62 0%, #27A395 100%)' }}
+            >
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Upload File
+              </h3>
+              <button
+                onClick={closeUploadModal}
+                disabled={uploading}
+                className="text-white/70 hover:text-white transition-colors disabled:opacity-50"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* File Name */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  File Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={fileName}
+                  onChange={(e) => setFileName(e.target.value)}
+                  placeholder="Enter a descriptive name for this file"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#27A395] transition-colors"
+                />
+                <p className="text-xs text-gray-400 mt-1">Give this file a descriptive name</p>
+              </div>
+
+              {/* Drag & Drop */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Select File <span className="text-red-500">*</span>
+                </label>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => !selectedFile && fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                    selectedFile
+                      ? 'border-green-400 bg-green-50 cursor-default'
+                      : isDragging
+                      ? 'border-[#27A395] bg-teal-50 cursor-copy'
+                      : 'border-gray-300 hover:border-[#27A395] hover:bg-gray-50 cursor-pointer'
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+                  {selectedFile ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <FileText className="w-8 h-8 text-green-600 flex-shrink-0" />
+                      <div className="text-left min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{selectedFile.name}</p>
+                        <p className="text-xs text-gray-400">{formatFileSize(selectedFile.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); removeSelectedFile(); }}
+                        className="ml-2 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 font-medium">Drag file here or click to browse</p>
+                      <p className="text-xs text-gray-400 mt-1">Supported: PDF, Images, Documents</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress */}
+              {uploading && (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Uploading and processing...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-200"
+                      style={{
+                        width: `${uploadProgress}%`,
+                        background: 'linear-gradient(90deg, #27A395 0%, #33A8D3 100%)',
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
+            </div>
+
+            <div className="px-5 py-4 border-t flex justify-end gap-3">
+              <button
+                onClick={closeUploadModal}
+                disabled={uploading}
+                className="px-5 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors text-sm disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpload}
+                disabled={!selectedFile || !fileName || uploading}
+                className="flex items-center gap-2 px-5 py-2 rounded-lg text-white font-semibold text-sm disabled:opacity-60 transition-all hover:-translate-y-0.5"
+                style={{ background: 'linear-gradient(135deg, #27A395 0%, #33A8D3 100%)' }}
+              >
+                {uploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Preview Modal ── */}
+      {showPreviewModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+          onClick={(e) => e.target === e.currentTarget && closePreview()}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col overflow-hidden"
+            style={{ maxHeight: '90vh' }}
+          >
+            <div
+              className="flex items-center justify-between px-5 py-4 flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #354B62 0%, #27A395 100%)' }}
+            >
+              <h3 className="text-white font-semibold flex items-center gap-2 min-w-0">
+                <FileText className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">{previewFileData?.fileName || 'File Preview'}</span>
+              </h3>
+              <button
+                onClick={closePreview}
+                className="text-white/70 hover:text-white transition-colors flex-shrink-0 ml-3"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto">
+              {loadingPreview ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <div className="w-10 h-10 border-4 border-[#27A395] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">Loading preview...</p>
+                  </div>
+                </div>
+              ) : previewError ? (
+                <div className="flex items-center justify-center py-16 text-center">
+                  <div>
+                    <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                    <p className="text-gray-700 font-medium">{previewError}</p>
+                  </div>
+                </div>
+              ) : previewFileUrl ? (
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-gray-50 border-b text-sm text-gray-600">
+                    <div className="flex flex-wrap gap-4">
+                      {previewFileData?.fileSize && (
+                        <span><strong>Size:</strong> {formatFileSize(previewFileData.fileSize)}</span>
+                      )}
+                      {previewFileData?.mimeType && (
+                        <span><strong>Type:</strong> {getMimeLabel(previewFileData.mimeType)}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <a
+                        href={previewFileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#27A395] text-white hover:bg-[#229b87] transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Open in New Tab
+                      </a>
+                      <a
+                        href={previewFileUrl}
+                        download={previewFileData?.fileName}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                  <iframe
+                    src={previewFileUrl}
+                    title="File Preview"
+                    style={{ width: '100%', height: 'calc(90vh - 160px)', border: 'none' }}
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border-t px-5 py-3 flex justify-end flex-shrink-0">
+              <button
+                onClick={closePreview}
+                className="px-5 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ── JourneyDetailView ─────────────────────────────────────────────────────────
 // Accepts `id` prop (from query param). Back button navigates to /journey.
 
@@ -932,6 +1398,13 @@ export default function JourneyDetailView({ id }) {
             )}
           </div>
         </div>
+
+        {/* ── Attachments ── */}
+        <AttachmentsSection
+          journey={journey}
+          token={token || (typeof window !== 'undefined' ? localStorage.getItem('auth') : '')}
+          onRefresh={loadJourney}
+        />
 
         {/* ── Notes ── */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden">
