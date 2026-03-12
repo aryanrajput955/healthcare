@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, User, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronDown, User, ChevronRight, Activity } from "lucide-react";
 import useAuthStore from "../lib/authstore";
 
 export default function Navbar() {
@@ -127,6 +127,8 @@ export default function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
+              {!token && (
+                <>
               {/* Enterprise */}
               <div className="relative">
                 <button
@@ -206,22 +208,38 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+                </>
+              )}
 
-              <Link href="/about-us" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
-                About Us
-              </Link>
-              <Link href="/contact" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
-                Contact
-              </Link>
+              {!token && (
+                <>
+                  <Link href="/about-us" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
+                    About Us
+                  </Link>
+                  <Link href="/contact" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
+                    Contact
+                  </Link>
+                </>
+              )}
 
               {/* Auth */}
               {token ? (
-                <Link
-                  href="/profile"
-                  className="flex items-center cursor-pointer hover:scale-105 ease-in text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
-                >
-                  <User className="w-6 h-6" />
-                </Link>
+                <div className="flex items-center gap-5">
+                  <Link
+                    href="/journey"
+                    className="flex items-center gap-1.5 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                  >
+                    <Activity className="w-4 h-4" />
+                    My Journeys
+                  </Link>
+                  <button
+                    onClick={toggleSideNav}
+                    className="flex items-center cursor-pointer hover:scale-105 ease-in text-[#354B62] hover:text-[#27A395] transition-colors"
+                    aria-label="Open account menu"
+                  >
+                    <User className="w-6 h-6" />
+                  </button>
+                </div>
               ) : (
                 <>
                   <Link href="/login" className="text-[#354B62] hover:text-[#27A395] transition-colors font-medium">
@@ -255,81 +273,90 @@ export default function Navbar() {
                 Home
               </Link>
 
-              {/* Enterprise Mobile */}
-              <div className="px-3 py-2">
-                <button
-                  onClick={() => setIsEnterpriseOpen((v) => !v)}
-                  className="flex w-full items-center justify-between text-left text-[#354B62] hover:text-[#27A395] font-medium"
-                >
-                  Enterprise Solutions
-                  <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isEnterpriseOpen ? "rotate-180" : ""}`} />
-                </button>
-                {isEnterpriseOpen && (
-                  <div className="mt-2 pl-4 space-y-1 bg-gray-50 rounded-lg p-2">
-                    {enterpriseSolutions.map((s, i) => (
-                      <Link
-                        key={i}
-                        href={s.href}
-                        className="flex items-center py-2 text-sm text-gray-600 hover:text-[#27A395]"
-                        onClick={() => {
-                          setIsOpen(false);
-                          setIsEnterpriseOpen(false);
-                        }}
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#27A395] mr-2"></div>
-                        {s.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Personal Mobile */}
-              <div className="px-3 py-2">
-                <button
-                  onClick={() => setIsPersonalOpen((v) => !v)}
-                  className="flex w-full items-center justify-between text-left text-[#354B62] hover:text-[#27A395] font-medium"
-                >
-                  Personal Solutions
-                  <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isPersonalOpen ? "rotate-180" : ""}`} />
-                </button>
-                {isPersonalOpen && (
-                  <div className="mt-2 pl-4 space-y-1 bg-gray-50 rounded-lg p-2">
-                    {personalSolutions.map((s, i) => (
-                      <Link
-                        key={i}
-                        href={s.href}
-                        className="flex items-center py-2 text-sm text-gray-600 hover:text-[#27A395]"
-                        onClick={() => {
-                          setIsOpen(false);
-                          setIsPersonalOpen(false);
-                        }}
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#27A395] mr-2"></div>
-                        {s.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Link href="/about-us" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>
-                About Us
-              </Link>
-              <Link href="/contact" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>
-                Contact
-              </Link>
-
               {token ? (
-                <Link
-                  href="/profile"
-                  className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Profile
-                </Link>
+                <>
+                  <Link
+                    href="/journey"
+                    className="flex items-center gap-2 px-3 py-2 text-[#354B62] hover:text-[#27A395] font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Activity className="w-4 h-4" />
+                    My Journeys
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    className="block w-full text-left px-3 py-2 text-red-500 hover:text-red-600 font-medium"
+                    onClick={() => { clearAuth(); setIsOpen(false); }}
+                  >
+                    Logout
+                  </button>
+                </>
               ) : (
                 <>
+                  {/* Enterprise Mobile */}
+                  <div className="px-3 py-2">
+                    <button
+                      onClick={() => setIsEnterpriseOpen((v) => !v)}
+                      className="flex w-full items-center justify-between text-left text-[#354B62] hover:text-[#27A395] font-medium"
+                    >
+                      Enterprise Solutions
+                      <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isEnterpriseOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {isEnterpriseOpen && (
+                      <div className="mt-2 pl-4 space-y-1 bg-gray-50 rounded-lg p-2">
+                        {enterpriseSolutions.map((s, i) => (
+                          <Link
+                            key={i}
+                            href={s.href}
+                            className="flex items-center py-2 text-sm text-gray-600 hover:text-[#27A395]"
+                            onClick={() => { setIsOpen(false); setIsEnterpriseOpen(false); }}
+                          >
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#27A395] mr-2"></div>
+                            {s.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Personal Mobile */}
+                  <div className="px-3 py-2">
+                    <button
+                      onClick={() => setIsPersonalOpen((v) => !v)}
+                      className="flex w-full items-center justify-between text-left text-[#354B62] hover:text-[#27A395] font-medium"
+                    >
+                      Personal Solutions
+                      <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isPersonalOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {isPersonalOpen && (
+                      <div className="mt-2 pl-4 space-y-1 bg-gray-50 rounded-lg p-2">
+                        {personalSolutions.map((s, i) => (
+                          <Link
+                            key={i}
+                            href={s.href}
+                            className="flex items-center py-2 text-sm text-gray-600 hover:text-[#27A395]"
+                            onClick={() => { setIsOpen(false); setIsPersonalOpen(false); }}
+                          >
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#27A395] mr-2"></div>
+                            {s.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <Link href="/about-us" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>
+                    About Us
+                  </Link>
+                  <Link href="/contact" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>
+                    Contact
+                  </Link>
                   <Link href="/login" className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium" onClick={() => setIsOpen(false)}>
                     Login
                   </Link>
@@ -361,7 +388,7 @@ export default function Navbar() {
               onClick={toggleSideNav}
               className="absolute top-6 right-6 text-[#354B62] hover:text-[#27A395] p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-[#27A395]"
             >
-              <X class逝Name="h-6 w-6" />
+              <X className="h-6 w-6" />
             </button>
 
             {/* Profile */}
