@@ -23,6 +23,7 @@ import {
   Eye,
   Download,
   ExternalLink,
+  MessageSquare,
 } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
 import useAuthStore from '../lib/authstore';
@@ -875,7 +876,7 @@ function AttachmentsSection({ journey, token, onRefresh }) {
                 const isImage = file.mimeType?.startsWith('image/');
                 return (
                   <div
-                    key={file.fileName || i}
+                    key={`${file.fileName || 'file'}-${i}`}
                     className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:shadow-sm transition-all"
                   >
                     <div
@@ -1157,7 +1158,7 @@ function AttachmentsSection({ journey, token, onRefresh }) {
 
 export default function JourneyDetailView({ id }) {
   const router = useRouter();
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
 
   const [journey, setJourney] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1279,7 +1280,16 @@ export default function JourneyDetailView({ id }) {
                   </p>
                 )}
               </div>
-              <StatusBadge status={journey.status} />
+              <div className="flex items-center gap-2">
+                <StatusBadge status={journey.status} />
+                <button
+                  onClick={() => router.push(`/journey/chat?id=${journey.id}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/90 hover:text-white border border-white/30 hover:border-white/60 bg-white/10 hover:bg-white/20 transition-all text-xs font-semibold flex-shrink-0"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  Chat
+                </button>
+              </div>
             </div>
           </div>
 
