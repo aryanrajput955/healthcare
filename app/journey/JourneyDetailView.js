@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -18,8 +18,9 @@ import {
   Send,
   Building2,
   Stethoscope,
+  Upload,
 } from 'lucide-react';
-import { API_BASE_URL } from '../lib/constants';
+import { API_BASE_URL, API_ENDPOINTS } from '../lib/constants';
 import useAuthStore from '../lib/authstore';
 import { generateUserCode } from '../lib/userCode';
 
@@ -295,13 +296,320 @@ function ActionResponseBody({ resp }) {
   );
 }
 
+// ── Inline Form Fill ──────────────────────────────────────────────────────────
+
+function InlineFormFill({ step, journey, token, userId, onSuccess }) {
+  const [fields, setFields] = useState([]);
+  const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [loadingForm, setLoadingForm] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.FORM_BY_ID(step.formId)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to load form');
+        const data = await res.json();
+        const raw = typeof data.fields === 'string' ? JSON.parse(data.fields) : data.fields;
+        // Support both flat array and sectioned { sections: [{ title, fields }] }
+        const sections = Array.isArray(raw)
+          ? [{ title: null, fields: raw }]
+          : (raw?.sections || []).map((s) => ({ title: s.title || null, fields: s.fields || [] }));
+        setFields(sections);
+        const initial = {};
+        sections.forEach(({ fields: flds }) =>
+          flds.forEach((f) => {
+            initial[f.name] = f.type === 'checkbox' && f.allowMultiple ? [] : '';
+          })
+        );
+        setFormData(initial);
+      } catch (e) {
+        setFetchError(e.message);
+      } finally {
+        setLoadingForm(false);
+      }
+    };
+    load();
+  }, [step.formId, token]);
+
+  const validateField = (name, value, field) => {
+    if (field.required && !value && value !== 0) return `${field.label || name} is required`;
+    if (value && field.type === 'email' && !/^\S+@\S+\.\S+$/.test(value)) return 'Invalid email';
+    if (value && field.type === 'tel' && !/^\+?[\d\s-]{10,}$/.test(value)) return 'Invalid phone';
+    return '';
+  };
+
+  const handleChange = (e, field) => {
+    const { name, value, type, checked } = e.target;
+    let newValue;
+    if (field.type === 'checkbox' && field.allowMultiple) {
+      const arr = formData[name] || [];
+      newValue = checked ? [...arr, value] : arr.filter((v) => v !== value);
+    } else if (type === 'checkbox') {
+      newValue = checked;
+    } else {
+      newValue = value;
+    }
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, newValue, field) }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    let valid = true;
+    fields.forEach(({ fields: flds }) =>
+      flds.forEach((f) => {
+        const err = validateField(f.name, formData[f.name], f);
+        if (err) { valid = false; newErrors[f.name] = err; }
+      })
+    );
+    setErrors(newErrors);
+    if (!valid) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.FORM_RESPONSE}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: Number(userId),
+          userJourneyId: Number(journey.id),
+          formId: Number(step.formId),
+          response: formData,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      onSuccess();
+    } catch (err) {
+      alert('Failed to submit: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loadingForm) {
+    return (
+      <div className="py-10 text-center">
+        <div className="w-8 h-8 border-4 border-[#27A395] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-gray-400 text-sm">Loading form fields…</p>
+      </div>
+    );
+  }
+  if (fetchError) {
+    return <div className="py-8 text-center text-red-500 text-sm">{fetchError}</div>;
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {fields.map(({ title, fields: sectionFields }, si) => (
+        <div key={si}>
+          {title && (
+            <p className="text-xs font-bold uppercase tracking-wider text-[#27A395] mb-3 pb-2 border-b border-gray-100">
+              {title}
+            </p>
+          )}
+          <div className="space-y-4">
+          {sectionFields.map((field) => (
+        <div key={field.name} className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">
+            {field.label || field.name}
+            {field.required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+          {field.description && <p className="text-xs text-gray-400 mb-1">{field.description}</p>}
+
+          {field.type === 'select' ? (
+            <select
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={(e) => handleChange(e, field)}
+              className="p-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#27A395]"
+            >
+              <option value="">Select…</option>
+              {field.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          ) : field.type === 'radio' ? (
+            <div className="flex gap-3 flex-wrap">
+              {field.options?.map((opt) => (
+                <label key={opt} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <input type="radio" name={field.name} value={opt}
+                    checked={formData[field.name] === opt}
+                    onChange={(e) => handleChange(e, field)} />
+                  {opt}
+                </label>
+              ))}
+            </div>
+          ) : field.type === 'checkbox' && field.allowMultiple ? (
+            <div className="flex gap-3 flex-wrap">
+              {field.options?.map((opt) => (
+                <label key={opt} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <input type="checkbox" name={field.name} value={opt}
+                    checked={formData[field.name]?.includes(opt)}
+                    onChange={(e) => handleChange(e, field)} />
+                  {opt}
+                </label>
+              ))}
+            </div>
+          ) : field.type === 'textarea' ? (
+            <textarea
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={(e) => handleChange(e, field)}
+              rows={3}
+              placeholder={field.description}
+              className="p-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#27A395] resize-none"
+            />
+          ) : (
+            <input
+              type={field.type || 'text'}
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={(e) => handleChange(e, field)}
+              placeholder={field.description}
+              className="p-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#27A395]"
+            />
+          )}
+          {errors[field.name] && (
+            <span className="text-xs text-red-500 mt-0.5">{errors[field.name]}</span>
+          )}
+        </div>
+          ))}
+          </div>
+        </div>
+      ))}
+
+      <div className="pt-2 flex justify-end">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex items-center gap-2 px-5 py-2 rounded-lg text-white font-semibold text-sm disabled:opacity-60 transition-all hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg, #27A395 0%, #33A8D3 100%)' }}
+        >
+          <Send className="w-4 h-4" />
+          {submitting ? 'Submitting…' : 'Submit Form'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// ── Inline Action Upload ──────────────────────────────────────────────────────
+
+function InlineActionUpload({ step, journey, token, onSuccess }) {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState('');
+  const [error, setError] = useState('');
+  const fileInputRef = useRef(null);
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const pdfFiles = files.filter((f) => f.type === 'application/pdf');
+    const imageFiles = files.filter((f) => f.type === 'image/jpeg' || f.type === 'image/png');
+    if (pdfFiles.length > 1 || imageFiles.length + pdfFiles.length !== files.length) {
+      setError('Only JPG/PNG images (multiple) and one PDF are permitted.');
+      return;
+    }
+
+    setUploading(true);
+    setProgress(0);
+    setError('');
+    setUploadStatus(`Uploading ${files.length} file${files.length > 1 ? 's' : ''}…`);
+
+    const fd = new FormData();
+    fd.append('actionId', step.actionId);
+    fd.append('userJourneyId', journey.id);
+    fd.append('response', JSON.stringify({}));
+    files.forEach((f) => fd.append('file', f));
+
+    const interval = setInterval(() => setProgress((p) => Math.min(p + 5, 90)), 150);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ACTION_RESPONSE}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      clearInterval(interval);
+      setProgress(100);
+      if (!res.ok) throw new Error((await res.text()) || 'Upload failed');
+      setUploadStatus('Upload complete!');
+      setTimeout(() => onSuccess(), 800);
+    } catch (err) {
+      clearInterval(interval);
+      setProgress(0);
+      setUploadStatus('');
+      setError(err.message || 'Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+        Upload supporting documents (JPG, PNG, or PDF) for this step.
+      </p>
+
+      {!uploading && !uploadStatus && (
+        <label
+          htmlFor={`upload-modal-${step.id}`}
+          className="cursor-pointer inline-flex items-center gap-2 bg-[#27A395] hover:bg-[#229b87] text-white font-medium py-2.5 px-5 rounded-lg transition-colors shadow-sm text-sm"
+        >
+          <Upload className="w-4 h-4" />
+          Upload Documents
+        </label>
+      )}
+      <input
+        id={`upload-modal-${step.id}`}
+        type="file"
+        multiple
+        accept="image/jpeg,image/png,application/pdf"
+        ref={fileInputRef}
+        onChange={handleUpload}
+        className="hidden"
+        disabled={uploading}
+      />
+
+      {uploading && (
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600">{uploadStatus}</p>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="h-2 rounded-full bg-[#27A395] transition-all duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-400">{progress}%</p>
+        </div>
+      )}
+
+      {uploadStatus && !uploading && (
+        <div className="flex items-center gap-2 text-green-600 font-medium text-sm">
+          <CheckCircle className="w-5 h-5" />
+          {uploadStatus}
+        </div>
+      )}
+
+      {error && <p className="text-sm text-red-500">{error}</p>}
+    </div>
+  );
+}
+
 // ── Step Response Modal ───────────────────────────────────────────────────────
 
-function StepResponseModal({ step, journey, onClose }) {
+function StepResponseModal({ step, journey, token, userId, onClose, onSuccess }) {
   if (!step) return null;
   const resp = getStepResponse(step, journey);
   const status = getStepStatus(step, journey);
   const isForm = !!step.formId;
+  const isCompleted = status === 'COMPLETED';
 
   const statusCls = {
     COMPLETED:   'bg-green-500/20 text-green-300',
@@ -339,16 +647,29 @@ function StepResponseModal({ step, journey, onClose }) {
           <p className="text-sm text-gray-600 bg-gray-50 border-l-4 border-gray-300 rounded-r-lg px-4 py-3 mb-5 leading-relaxed">
             {step.description}
           </p>
-          {!resp ? (
+
+          {isCompleted && resp ? (
+            isForm ? <FormResponseBody resp={resp} /> : <ActionResponseBody resp={resp} />
+          ) : isCompleted ? (
             <div className="text-center py-12">
-              <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium">No response recorded yet</p>
-              <p className="text-gray-400 text-sm mt-1">This step has not been completed.</p>
+              <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">Step completed</p>
             </div>
           ) : isForm ? (
-            <FormResponseBody resp={resp} />
+            <InlineFormFill
+              step={step}
+              journey={journey}
+              token={token}
+              userId={userId}
+              onSuccess={onSuccess}
+            />
           ) : (
-            <ActionResponseBody resp={resp} />
+            <InlineActionUpload
+              step={step}
+              journey={journey}
+              token={token}
+              onSuccess={onSuccess}
+            />
           )}
         </div>
 
@@ -649,7 +970,10 @@ export default function JourneyDetailView({ id }) {
         <StepResponseModal
           step={selectedStep}
           journey={journey}
+          token={token || (typeof window !== 'undefined' ? localStorage.getItem('auth') : '')}
+          userId={journey.userId}
           onClose={() => setSelectedStep(null)}
+          onSuccess={() => { setSelectedStep(null); loadJourney(); }}
         />
       )}
     </div>
