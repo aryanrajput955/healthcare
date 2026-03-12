@@ -224,7 +224,7 @@ const UserJourneyTimeline = () => {
           Authorization: `Bearer ${authToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id, journeyCode }),
+        body: JSON.stringify({ user_id: user.id, journey_code: journeyCode }),
       });
       if (!res.ok) throw new Error(await res.text());
       window.location.reload();
