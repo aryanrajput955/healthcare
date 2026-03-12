@@ -70,8 +70,8 @@ function LoginContent() {
       setAuth(userData, token);
       console.log("Login successful:", data);
 
-      // REDIRECT TO /profile
-      router.push("/profile");
+      // REDIRECT TO /journey
+      router.push("/journey");
 
     } catch (error) {
       console.error("Login error:", error);

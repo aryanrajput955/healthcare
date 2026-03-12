@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, User, ChevronRight, Activity } from "lucide-react";
+import { Menu, X, ChevronDown, User, ChevronRight, Activity, Users, Network } from "lucide-react";
 import useAuthStore from "../lib/authstore";
 
 export default function Navbar() {
@@ -19,6 +19,7 @@ export default function Navbar() {
   const personalTimeoutRef = useRef(null);
 
   const { user, token, initializeAuth, clearAuth } = useAuthStore();
+  const canInvite = ["ClaimTrue Corporate", "Branch Franchise", "Master Franchise", "Elite"].includes(user?.roles);
 
   // -----------------------------------------------------------------------
   // 1. Initialize auth & scroll detection (only for main navbar)
@@ -232,6 +233,24 @@ export default function Navbar() {
                     <Activity className="w-4 h-4" />
                     My Journeys
                   </Link>
+                  {canInvite && (
+                    <Link
+                      href="/referrals"
+                      className="flex items-center gap-1.5 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                    >
+                      <Users className="w-4 h-4" />
+                      Referrals
+                    </Link>
+                  )}
+                  {canInvite && (
+                    <Link
+                      href="/organisation"
+                      className="flex items-center gap-1.5 text-[#354B62] hover:text-[#27A395] transition-colors font-medium"
+                    >
+                      <Network className="w-4 h-4" />
+                      Organisation
+                    </Link>
+                  )}
                   <button
                     onClick={toggleSideNav}
                     className="flex items-center cursor-pointer hover:scale-105 ease-in text-[#354B62] hover:text-[#27A395] transition-colors"
@@ -283,6 +302,26 @@ export default function Navbar() {
                     <Activity className="w-4 h-4" />
                     My Journeys
                   </Link>
+                  {canInvite && (
+                    <Link
+                      href="/referrals"
+                      className="flex items-center gap-2 px-3 py-2 text-[#354B62] hover:text-[#27A395] font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Users className="w-4 h-4" />
+                      Referrals
+                    </Link>
+                  )}
+                  {canInvite && (
+                    <Link
+                      href="/organisation"
+                      className="flex items-center gap-2 px-3 py-2 text-[#354B62] hover:text-[#27A395] font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Network className="w-4 h-4" />
+                      Organisation
+                    </Link>
+                  )}
                   <Link
                     href="/profile"
                     className="block px-3 py-2 text-[#354B62] hover:text-[#27A395] font-medium"
