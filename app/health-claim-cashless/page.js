@@ -129,7 +129,7 @@ export default function CashlessClaimsPage() {
   return (
     <>
       <Head>
-        <title>Expert Cashless Claims Processing - Reduce Hospital Discharge Delays | Indiem</title>
+        <title>Expert Cashless Claims Processing - Reduce Hospital Discharge Delays | ClaimsTrue</title>
         <meta name="description" content="New specialized service for hospital cashless claim management. Expert processing, documentation support, faster approvals. Risk-free trial available." />
       </Head>
       <div className="min-h-screen bg-white selection:bg-[#27A395]/30">

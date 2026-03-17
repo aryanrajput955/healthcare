@@ -61,7 +61,7 @@ export default function ClaimsDelayResolutionPage() {
   return (
     <>
       <Head>
-        <title>Resolve Delayed Insurance Claims - Fast Settlement Resolution | Indiem</title>
+        <title>Resolve Delayed Insurance Claims - Fast Settlement Resolution | ClaimsTrue</title>
         <meta name="description" content="Stuck in an endless wait for your insurance claim? We force insurers to settle delayed claims using expert legal and regulatory pressure." />
       </Head>
       <div className="min-h-screen bg-white selection:bg-[#27A395]/30">

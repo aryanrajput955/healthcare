@@ -63,7 +63,7 @@ export default function ClaimShortSettledPage() {
   return (
     <>
       <Head>
-        <title>Recover Short-Settled Insurance Claims - Get Your Full Amount | Indiem</title>
+        <title>Recover Short-Settled Insurance Claims - Get Your Full Amount | ClaimsTrue</title>
         <meta name="description" content="Did your insurance company pay less than your actual bill? We challenge unfair deductions and recover the short-settled amount for you." />
       </Head>
       <div className="min-h-screen bg-white selection:bg-[#27A395]/30">
